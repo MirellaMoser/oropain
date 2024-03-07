@@ -68,10 +68,7 @@
         <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
           <img src="img/Element 1@2x.png" class="card-img-top" alt="..."></a>
       </div>
-
-
     </div>
-
 
     <div class="modal fade" id="baumerweiterung" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -81,34 +78,10 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="form-check">
+            <div class="form-check" v-for="cm in countermeasuresOptions">
               <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
               <label class="form-check-label" for="flexCheckDefault">
-                Massage
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-              <label class="form-check-label" for="flexCheckDefault">
-                Entspannungsübung
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-              <label class="form-check-label" for="flexCheckDefault">
-                Kieferdehnung
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-              <label class="form-check-label" for="flexCheckDefault">
-                Spazieren
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-              <label class="form-check-label" for="flexCheckDefault">
-                Sport
+                {{cm.name}}
               </label>
             </div>
           </div>
@@ -128,30 +101,23 @@
 
   <script type="module">
     import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-    import  axios from 'https://cdn.jsdelivr.net/npm/axios@1.6.7/+esm'
+    import axios from 'https://cdn.jsdelivr.net/npm/axios@1.6.7/+esm'
+
+    const countermeasuresOptions = ref([])
     createApp({
       setup() {
-        const message = ref('Hello Vue!')
-        return {
-          message
-        }
-      },
-      data() {
-        return {
-          info: null
-        }
+        return {countermeasuresOptions};
       },
       mounted() {
+        console.log(countermeasuresOptions);
+
         axios
           .get('/countermeasures')
           .then(response => {
-            this.info = JSON.parse(response.data)
-            console.log(this.info);
-
+            countermeasuresOptions.value = response.data;
+            console.log(countermeasuresOptions);
           })
       }
-
-
     }).mount('#app')
   </script>
 </body>
