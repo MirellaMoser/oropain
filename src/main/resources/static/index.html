@@ -104,18 +104,16 @@
     import axios from 'https://cdn.jsdelivr.net/npm/axios@1.6.7/+esm'
 
     const countermeasuresOptions = ref([])
+    
     createApp({
       setup() {
         return {countermeasuresOptions};
       },
-      mounted() {
-        console.log(countermeasuresOptions);
-
+      mounted() {    
         axios
           .get('/countermeasures')
           .then(response => {
             countermeasuresOptions.value = response.data;
-            console.log(countermeasuresOptions);
           })
       }
     }).mount('#app')
