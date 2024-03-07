@@ -16,14 +16,19 @@ insert into SYMPTOM (NAME, IS_DEFAULT) values ('Zahnschmerzen', true);
 
 insert into COUNTER_MEASURE (NAME, IS_DEFAULT) values ('Massage', true); 
 insert into COUNTER_MEASURE (NAME, IS_DEFAULT) values ('Entspannungsübungen', true); 
-insert into COUNTER_MEASURE (NAME, IS_DEFAULT) values ('Bewegung', true);
+insert into COUNTER_MEASURE (NAME, IS_DEFAULT) values ('Kieferdehnung', true);
+insert into COUNTER_MEASURE (NAME, IS_DEFAULT) values ('Spazieren', true);
+insert into COUNTER_MEASURE (NAME, IS_DEFAULT) values ('Sport', true);
+
+
+
 
 insert into SITUATION_COUNTER_MEASURES (SITUATION_ID, COUNTER_MEASURES_NAME) values (1, 'Massage');
-insert into SITUATION_COUNTER_MEASURES (SITUATION_ID, COUNTER_MEASURES_NAME) values (1, 'Bewegung');
+insert into SITUATION_COUNTER_MEASURES (SITUATION_ID, COUNTER_MEASURES_NAME) values (1, 'Sport');
 insert into SITUATION_STRESSORS (SITUATION_ID, STRESSORS_NAME) values (1, 'Beziehung');
 insert into SITUATION_SYMPTOMS (SITUATION_ID, SYMPTOMS_NAME) values (1, 'Migräne');
 
-insert into SITUATION_COUNTER_MEASURES (SITUATION_ID, COUNTER_MEASURES_NAME) values (2, 'Bewegung');
+insert into SITUATION_COUNTER_MEASURES (SITUATION_ID, COUNTER_MEASURES_NAME) values (2, 'Sport');
 insert into SITUATION_STRESSORS (SITUATION_ID, STRESSORS_NAME) values (2, 'Arbeit');
 insert into SITUATION_SYMPTOMS (SITUATION_ID, SYMPTOMS_NAME) values (2, 'Zahnschmerzen');
 insert into SYMPTOM (NAME, IS_DEFAULT) values ('Zungenbrennen', false); 
