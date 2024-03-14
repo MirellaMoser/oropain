@@ -23,35 +23,28 @@
     <component :is="currentView" />
 </template>
 
-<script>
+<script setup>
 import { ref, computed } from 'vue';
 import Home from './Home.vue'
 import Input from './Input.vue'
 import Overview from './Overview.vue'
 
-export default {
-    setup() {
 
-        const countermeasuresOptions = ref([]);
+const countermeasuresOptions = ref([]);
 
-        const routes = {
-            '/': Home,
-            '/input': Input,
-            '/overview': Overview,
-        }
-
-        const currentPath = ref(window.location.hash)
-
-        window.addEventListener('hashchange', () => {
-            currentPath.value = window.location.hash
-        })
-
-        const currentView = computed(() => {
-            return routes[currentPath.value.slice(1) || '/'] || NotFound
-        })
-        return {
-            currentView
-        }
-    }
+const routes = {
+    '/': Home,
+    '/input': Input,
+    '/overview': Overview,
 }
+
+const currentPath = ref(window.location.hash)
+
+window.addEventListener('hashchange', () => {
+    currentPath.value = window.location.hash
+})
+
+const currentView = computed(() => {
+    return routes[currentPath.value.slice(1) || '/'] || NotFound
+})
 </script>

@@ -58,37 +58,24 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted } from 'vue';
 
+const countermeasuresOptions = ref([]);
+const overview = ref([]);
 
-export default {
-    setup() {
+onMounted(() => {
+    axios.get('/api/situation/current/countermeasures').then(response => {
+        countermeasuresOptions.value = response.data;
+    });
+    axios.get('/api/situation/current/overview').then(response => {
+        overview.value = response.data;
+    });
+});
 
-        const countermeasuresOptions = ref([]);
-        const overview = ref([]);
+const saveCountermeasures = () => {
+    axios.post('/api/situation/current/countermeasures', countermeasuresOptions.value).then(response => {
 
-        onMounted(() => {
-            axios.get('/api/situation/current/countermeasures').then(response => {
-                countermeasuresOptions.value = response.data;
-            });
-            axios.get('/api/situation/current/overview').then(response => {
-                overview.value = response.data;
-            });
-        });
-
-        const saveCountermeasures = () => {
-            axios.post('/api/situation/current/countermeasures', countermeasuresOptions.value).then(response => {
-
-            });
-        };
-
-        return {
-            countermeasuresOptions,
-            overview,
-            saveCountermeasures
-        }
-    },
-
-}
+    });
+};
 </script>
