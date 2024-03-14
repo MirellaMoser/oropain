@@ -2,6 +2,7 @@ package ch.zhaw.mosltech.NoPainIsGainBackend.dto;
 
 import java.util.Date;
 
+import ch.zhaw.mosltech.NoPainIsGainBackend.entity.ETimeOfDay;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Situation;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Stressor;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Symptom;
@@ -15,7 +16,7 @@ public class OverviewDTO {
     private String stressors;
     private Date dateOfEntry;
 
-    private String timeOfEntry;
+    private ETimeOfDay timeOfEntry;
 
 
     public OverviewDTO(Situation situation) {
@@ -62,6 +63,6 @@ public class OverviewDTO {
         this.stressors = stressorsAggregated;
         this.dateOfEntry = situation.getDateTime();
 
-        this.timeOfEntry = "TODO: morgens, mittags, abends";
+        this.timeOfEntry = situation.getTimeOfDay();
     }
 }

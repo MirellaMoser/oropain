@@ -10,81 +10,99 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Schmerz-Intensität
-                    <span><select class="form-select" aria-label="Default select example">
-                            <option selected>keine Angabe</option>
-                            <option value="1">0</option>
-                            <option value="2">1</option>
-                            <option value="3">2</option>
+                    <span>
+                        <select class="form-select" aria-label="Default select example" v-model="selectionModel.intensity">
+                            <option value="-1">keine Angabe</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
                             <option value="3">3</option>
-                            <option value="3">4</option>
-                            <option value="3">5</option>
-                            <option value="3">6</option>
-                            <option value="3">7</option>
-                            <option value="3">8</option>
-                            <option value="3">9</option>
-                            <option value="3">10</option>
-                        </select></span>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Symptome
                     <span>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        <div class="form-check" v-for="cm in selectionModel.symptoms">
+                            <input class="form-check-input" type="checkbox" v-model="cm.selected" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
-                                Nackenschmerzen
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                Kieferschmerzen
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                Brennende Zunge
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                Migräne
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                Zahnschmerzen
+                                {{ cm.name }}
                             </label>
                         </div>
                     </span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Stress-Level
-                    <span><select class="form-select" aria-label="Default select example">
-                            <option selected>keine Angabe</option>
-                            <option value="1">ohne</option>
-                            <option value="2">tief</option>
-                            <option value="3">mittel</option>
-                            <option value="3">hoch</option>
-                        </select></span>
+                    <span>
+                        <select class="form-select" aria-label="Default select example" v-model="selectionModel.stressLevel">
+                            <option value="-1">keine Angabe</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Stressoren
-                    <span>Zeitverlust durch Stau</span>
+                    <span>
+                        <div class="form-check" v-for="cm in selectionModel.stressors">
+                            <input class="form-check-input" type="checkbox" v-model="cm.selected" id="flexCheckDefault">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                {{ cm.name }}
+                            </label>
+                        </div>
+                    </span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Zeitpunkt
-                    <span><select class="form-select" aria-label="Default select example">
-                            <option selected>keine Angabe</option>
-                            <option value="1">Morgen</option>
-                            <option value="2">Mittag</option>
-                            <option value="3">Abend</option>
+                    <span><select class="form-select" v-model="selectionModel.timeOfDay" aria-label="Default select example">
+                            <option value="UNSET">keine Angabe</option>
+                            <option value="MORNING">Morgen</option>
+                            <option value="AFTERNOON">Nachmittag</option>
+                            <option value="EVENING">Abend</option>
+                            <option value="NIGHT">Nacht</option>
                         </select></span>
                 </li>
             </ul>
-            <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung"></a>
+            <div class="card-footer">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-primary" @click="saveSituation">Save changes</button>
+                </li>
+            </div>
         </div>
     </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const selectionModel = ref([]);
+
+onMounted(() => {
+    axios.get('/api/situation/new/empty').then(response => {
+        selectionModel.value = response.data;
+    });
+});
+
+const saveSituation = () => {
+    axios.post('/api/situation', selectionModel.value).then(response => {
+        //router.push({ path: './Home.vue' });
+    });
+};
+
+</script>

@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,6 +26,9 @@ public class Situation {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateTime = new Date();
 
+    @Enumerated(EnumType.STRING)
+    private ETimeOfDay timeOfDay;
+    
     private Integer painLevel;
     private Integer stressLevel;
 

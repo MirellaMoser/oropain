@@ -25,8 +25,12 @@
                     <span>{{ overview.stressors }}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Zeitpunkt
-                    <span>{{ overview.timeOfEntry }}</span>
+                    Zeitpunkt                    
+                    <span v-if="overview.timeOfEntry === 'UNSET'">Keine Angabe</span>
+                    <span v-if="overview.timeOfEntry === 'MORNING'">Morgen</span>
+                    <span v-if="overview.timeOfEntry === 'AFTERNOON'">Nachmittag</span>
+                    <span v-if="overview.timeOfEntry === 'EVENING'">Abend</span>
+                    <span v-if="overview.timeOfEntry === 'NIGHT'">Nacht</span>
                 </li>
             </ul>
             <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
@@ -74,8 +78,6 @@ onMounted(() => {
 });
 
 const saveCountermeasures = () => {
-    axios.post('/api/situation/current/countermeasures', countermeasuresOptions.value).then(response => {
-
-    });
+    axios.post('/api/situation/current/countermeasures', countermeasuresOptions.value).then(response => {});
 };
 </script>

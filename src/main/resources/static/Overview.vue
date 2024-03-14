@@ -5,7 +5,9 @@
                 Schmerz-Intensität
             </div>
             <ul class="list-group list-group-flush">
-                <img src="img/Schmerzintensität.png" class="img-fluid" alt="...">
+                <div>
+                    <canvas id="pain-chart"></canvas>
+                </div>
             </ul>
         </div>
     </div>
@@ -15,7 +17,9 @@
                 Stress-Level
             </div>
             <ul class="list-group list-group-flush">
-                <img src="img/Stresslevel.png" class="img-fluid" alt="...">
+                <div>
+                    <canvas id="stress-chart"></canvas>
+                </div>
             </ul>
         </div>
     </div>
@@ -67,3 +71,52 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+
+import { Chart, ChartConfiguration, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale } from 'chartjs';
+Chart.register(LineController, LineElement, PointElement, LinearScale, Title, CategoryScale);
+
+
+
+
+
+onMounted(() => {
+    axios.get('/api/overview/painPlot').then(response => {
+        let data = response.data;
+        new Chart(document.getElementById('pain-chart'), {
+            type: "line",
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: "Pain",
+                        data: data.data
+                    }
+                ]
+            }
+        })
+    });
+
+    axios.get('/api/overview/stressPlot').then(response => {
+        let data = response.data;
+        new Chart(document.getElementById('stress-chart'), {
+            type: "line",
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: "Stress",
+                        data: data.data
+                    }
+                ]
+            }
+        })
+    });
+
+});
+
+
+
+</script>
