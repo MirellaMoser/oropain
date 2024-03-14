@@ -19,6 +19,8 @@ public class HttpBasicSecurityConfing {
                 })
                 .formLogin(withDefaults())
                 .csrf(csrf -> csrf.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")))
+                .csrf(csrf -> csrf.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/api/**")))
+
                 .headers(headers -> headers.frameOptions((frameOptions) -> frameOptions.disable()))
                 .build();
     }

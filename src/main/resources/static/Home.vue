@@ -4,29 +4,29 @@
             <div class="card-header">
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Meine Angaben
-                    <span>01.03.2024</span>
+                    <span>{{ overview.dateOfEntry }}</span>
                 </li>
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Schmerz-Intensität
-                    <span>2</span>
+                    <span>{{ overview.intensity }}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Symptome
-                    <span>keine</span>
+                    <span>{{ overview.symptoms }}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Stress-Level
-                    <span>tief</span>
+                    <span>{{ overview.stressLevel }}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Stressoren
-                    <span>Zeitverlust durch Stau</span>
+                    <span>{{ overview.stressors }}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Zeitpunkt
-                    <span>Mittag</span>
+                    <span>{{ overview.timeOfEntry }}</span>
                 </li>
             </ul>
             <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
@@ -43,7 +43,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-check" v-for="cm in countermeasuresOptions">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        <input class="form-check-input" type="checkbox" v-model="cm.selected" id="flexCheckDefault">
                         <label class="form-check-label" for="flexCheckDefault">
                             {{ cm.name }}
                         </label>
@@ -51,7 +51,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="saveCountermeasures">Save changes</button>
                 </div>
             </div>
         </div>
@@ -59,22 +59,34 @@
 </template>
 
 <script>
-import { ref,onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 
 
 export default {
     setup() {
 
         const countermeasuresOptions = ref([]);
+        const overview = ref([]);
 
         onMounted(() => {
-            axios.get('/countermeasures').then(response => {
+            axios.get('/api/situation/current/countermeasures').then(response => {
                 countermeasuresOptions.value = response.data;
+            });
+            axios.get('/api/situation/current/overview').then(response => {
+                overview.value = response.data;
             });
         });
 
+        const saveCountermeasures = () => {
+            axios.post('/api/situation/current/countermeasures', countermeasuresOptions.value).then(response => {
+
+            });
+        };
+
         return {
-            countermeasuresOptions
+            countermeasuresOptions,
+            overview,
+            saveCountermeasures
         }
     },
 
