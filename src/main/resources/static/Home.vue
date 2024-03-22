@@ -34,8 +34,18 @@
                         <span v-if="overview.timeOfEntry === 'NIGHT'">Nacht</span>
                     </li>
                 </ul>
-                <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
-                    <img src="img/Element 1@2x.png" class="card-img-top" alt="..."></a>
+                <div style="position:relative;">
+                    <div style="position: absolute;">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
+                            <img :src="imagePath" style="width: 100%; max-width: 100%;">
+                        </a>
+                    </div>
+                    <div style="position: absolute; top: 0px;">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
+                            <img :src="overlayPath" style="width: 100%; max-width: 100%;">
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -71,17 +81,57 @@ import { ref, onMounted } from 'vue';
 
 const countermeasuresOptions = ref([]);
 const overview = ref([]);
+const imagePath = ref();
+const overlayPath = ref();
+
 
 onMounted(() => {
     axios.get('/api/situation/current/countermeasures').then(response => {
         countermeasuresOptions.value = response.data;
+        updateOverviewImage();
     });
     axios.get('/api/situation/current/overview').then(response => {
         overview.value = response.data;
+        updateOverviewImage();
+        console.log(response.data);
+
     });
 });
 
 const saveCountermeasures = () => {
-    axios.post('/api/situation/current/countermeasures', countermeasuresOptions.value).then(response => { });
+    axios.post('/api/situation/current/countermeasures', countermeasuresOptions.value).then(response => {
+        updateOverviewImage();
+    });
 };
+
+const updateOverviewImage = () => {
+
+    var selectedCms = 0;
+    for(const cm of countermeasuresOptions.value) {
+        if(cm.selected) selectedCms ++;
+    }
+    if(selectedCms > 3) selectedCms = 3;
+
+    if(overview.value.stressLevel === undefined) return;
+
+    if (overview.value.stressLevel === "kein") {
+        imagePath.value = "/img/stress_null/kein_" + overview.value.intensity + ".svg";
+        overlayPath.value = "/img/stress_vull/overlay_Stufe"+selectedCms+".svg";
+    }
+    else if (overview.value.stressLevel === "tief") {
+        imagePath.value = "/img/stress_small/tief_" + overview.value.intensity + ".svg";
+        overlayPath.value = "/img/stress_small/overlay_Stufe"+selectedCms+".svg";
+    }
+    else if (overview.value.stressLevel === "mittel") {
+        imagePath.value = "/img/stress_medium/mittel_" +overview.value.intensity + ".svg";
+        overlayPath.value = "/img/stress_medium/overlay_Stufe"+selectedCms+".svg";
+    }
+    else {
+        imagePath.value = "/img/stress_high/hoch_" + overview.value.intensity + ".svg";
+        overlayPath.value = "/img/stress_high/overlay_Stufe"+selectedCms+".svg";
+    }
+
+
+};
+
 </script>

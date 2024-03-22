@@ -32,12 +32,15 @@ public class OverviewDTO {
         this.symptoms = symptomsAggregated;
 
         switch(situation.getStressLevel()) {
+            case 0:
+                this.stressLevel = "kein";
+                break;
             case 1:
             case 2:
             case 3:
-            case 4:
                 this.stressLevel = "tief";
                 break;
+            case 4:
             case 5:
             case 6:
             case 7:
@@ -49,7 +52,7 @@ public class OverviewDTO {
                 this.stressLevel = "hoch";
                 break;
             default:
-                this.stressLevel = "k.A.";
+                this.stressLevel = "kein";
                 break;
         }
 
