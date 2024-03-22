@@ -101,7 +101,7 @@ onMounted(() => {
 
 const saveSituation = () => {
     axios.post('/api/situation', selectionModel.value).then(response => {
-        //router.push({ path: './Home.vue' });
+        window.location.href = '#/';
     });
 };
 
