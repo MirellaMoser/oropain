@@ -30,7 +30,7 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Symptome
                     <span>
-                        <div class="form-check" v-for="cm in selectionModel.symptoms">
+                        <div class="form-check" v-bind:key="cm.name" v-for="cm in selectionModel.symptoms">
                             <input class="form-check-input" type="checkbox" v-model="cm.selected" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 {{ cm.name }}
@@ -41,7 +41,8 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Stress-Level
                     <span>
-                        <select class="form-select" aria-label="Default select example" v-model="selectionModel.stressLevel">
+                        <select class="form-select" aria-label="Default select example"
+                            v-model="selectionModel.stressLevel">
                             <option value="-1">keine Angabe</option>
                             <option value="0">0</option>
                             <option value="1">1</option>
@@ -60,7 +61,7 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Stressoren
                     <span>
-                        <div class="form-check" v-for="cm in selectionModel.stressors">
+                        <div class="form-check" v-bind:key="cm.name" v-for="cm in selectionModel.stressors">
                             <input class="form-check-input" type="checkbox" v-model="cm.selected" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 {{ cm.name }}
@@ -70,7 +71,8 @@
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Zeitpunkt
-                    <span><select class="form-select" v-model="selectionModel.timeOfDay" aria-label="Default select example">
+                    <span><select class="form-select" v-model="selectionModel.timeOfDay"
+                            aria-label="Default select example">
                             <option value="UNSET">keine Angabe</option>
                             <option value="MORNING">Morgen</option>
                             <option value="AFTERNOON">Nachmittag</option>

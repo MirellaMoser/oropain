@@ -107,30 +107,30 @@ const saveCountermeasures = () => {
 const updateOverviewImage = () => {
 
     var selectedCms = 0;
-    for(const cm of countermeasuresOptions.value) {
-        if(cm.selected) selectedCms ++;
+    for (const cm of countermeasuresOptions.value) {
+        if (cm.selected) selectedCms++;
     }
-    if(selectedCms > 3) selectedCms = 3;
+    if (selectedCms > 3) selectedCms = 3;
 
-    if(overview.value.stressLevel === undefined) return;
+    if (overview.value.stressLevel === undefined) return;
 
-    if(overview.value.intensity === -1) overview.value.intensity = 0;
+    if (overview.value.intensity === -1) overview.value.intensity = 0;
 
     if (overview.value.stressLevel === "kein") {
         imagePath.value = "/img/stress_null/kein_" + overview.value.intensity + ".svg";
-        overlayPath.value = "/img/stress_null/overlay_Stufe"+selectedCms+".svg";
+        overlayPath.value = "/img/stress_null/overlay_Stufe" + selectedCms + ".svg";
     }
     else if (overview.value.stressLevel === "tief") {
         imagePath.value = "/img/stress_small/tief_" + overview.value.intensity + ".svg";
-        overlayPath.value = "/img/stress_small/overlay_Stufe"+selectedCms+".svg";
+        overlayPath.value = "/img/stress_small/overlay_Stufe" + selectedCms + ".svg";
     }
     else if (overview.value.stressLevel === "mittel") {
-        imagePath.value = "/img/stress_medium/mittel_" +overview.value.intensity + ".svg";
-        overlayPath.value = "/img/stress_medium/overlay_Stufe"+selectedCms+".svg";
+        imagePath.value = "/img/stress_medium/mittel_" + overview.value.intensity + ".svg";
+        overlayPath.value = "/img/stress_medium/overlay_Stufe" + selectedCms + ".svg";
     }
     else {
         imagePath.value = "/img/stress_high/hoch_" + overview.value.intensity + ".svg";
-        overlayPath.value = "/img/stress_high/overlay_Stufe"+selectedCms+".svg";
+        overlayPath.value = "/img/stress_high/overlay_Stufe" + selectedCms + ".svg";
     }
 };
 </script>
