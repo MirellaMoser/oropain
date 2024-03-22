@@ -9,5 +9,6 @@ import lombok.Data;
 public class Stressor {
     @Id
     private String name;
+    private String category;
     private boolean isDefault;
 }
