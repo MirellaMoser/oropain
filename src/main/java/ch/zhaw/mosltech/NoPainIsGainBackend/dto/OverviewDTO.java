@@ -2,15 +2,15 @@ package ch.zhaw.mosltech.NoPainIsGainBackend.dto;
 
 import java.util.Date;
 
+import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecord;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.ETimeOfDay;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Situation;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Stressor;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Symptom;
 import lombok.Value;
 
 @Value
 public class OverviewDTO {
-    private int intensity;
+    private Double intensity;
     private String symptoms;
     private String stressLevel;
     private String stressors;
@@ -19,19 +19,28 @@ public class OverviewDTO {
     private ETimeOfDay timeOfEntry;
 
 
-    public OverviewDTO(Situation situation) {
-        this.intensity = situation.getPainLevel();
+    public OverviewDTO(DailyRecord record) {
+        if(record.getSituations().size() == 0) {
+            intensity = 0.0;
+            symptoms = "";
+            stressLevel ="kein";
+            stressors = "";
+            dateOfEntry = new Date();
+            timeOfEntry = ETimeOfDay.UNSET;
+            return;
+        }
+        this.intensity = record.getAveragePainLevel();
         
         String symptomsAggregated = "";
-        for (Symptom s : situation.getSymptoms()) {
+        for (Symptom s : record.getLatestSituation().getSymptoms()) {
             symptomsAggregated += s.getName() + ", ";
         }
-        if (!situation.getSymptoms().isEmpty()) {
+        if (!record.getLatestSituation().getSymptoms().isEmpty()) {
             symptomsAggregated = symptomsAggregated.substring(0,symptomsAggregated.length()-2);
         }
         this.symptoms = symptomsAggregated;
 
-        switch(situation.getStressLevel()) {
+        switch(record.getLatestSituation().getStressLevel()) {
             case 0:
                 this.stressLevel = "kein";
                 break;
@@ -50,15 +59,15 @@ public class OverviewDTO {
         }
 
         String stressorsAggregated = "";
-        for (Stressor s : situation.getStressors()) {
+        for (Stressor s : record.getLatestSituation().getStressors()) {
             stressorsAggregated += s.getName() + ", ";
         }
-        if (!situation.getStressors().isEmpty()) {
+        if (!record.getLatestSituation().getStressors().isEmpty()) {
             stressorsAggregated = stressorsAggregated.substring(0,stressorsAggregated.length()-2);
         }
         this.stressors = stressorsAggregated;
-        this.dateOfEntry = situation.getDateTime();
+        this.dateOfEntry = record.getDateTime();
 
-        this.timeOfEntry = situation.getTimeOfDay();
+        this.timeOfEntry = record.getLatestSituation().getTimeOfDay();
     }
 }

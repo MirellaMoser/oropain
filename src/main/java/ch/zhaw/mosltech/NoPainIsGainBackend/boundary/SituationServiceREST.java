@@ -1,6 +1,7 @@
 package ch.zhaw.mosltech.NoPainIsGainBackend.boundary;
 
 import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,8 @@ import ch.zhaw.mosltech.NoPainIsGainBackend.dto.OverviewDTO;
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.StressorSelectionDTO;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.CounterMeasure;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.CounterMeasureRepository;
+import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecord;
+import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecordRepository;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.ETimeOfDay;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Situation;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.SituationRepository;
@@ -42,6 +45,9 @@ public class SituationServiceREST {
     private UserRepository userRepository;
 
     @Autowired
+    private DailyRecordRepository dailyRecordRepository;
+
+    @Autowired
     private SituationRepository situationRepository;
 
     @Autowired
@@ -50,20 +56,13 @@ public class SituationServiceREST {
     @Autowired
     private StressorRepository stressorRepository;
 
-    @GetMapping
-    public List<Situation> getAll(Principal principal) {
-        String loginName = principal.getName();
-        User user = userRepository.findById(loginName).get();
-       return user.getSituations();
-    }
-
     @GetMapping("/current/countermeasures")
     public List<ElementSelectionDTO> getAllDefaultCounterMeasures(Principal principal) {
-        Situation situation = getCurrentSituation(principal);
+        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
         List<CounterMeasure> defaultCounterMeasures = counterMeasureRepository.findAllByIsDefault(true);
         List<ElementSelectionDTO> selectedCounterMeasures = new ArrayList<>();
         for (CounterMeasure defaultCM : defaultCounterMeasures) {
-            if (situation.getCounterMeasures().contains(defaultCM)) {
+            if (dailyRecord.getCounterMeasures().contains(defaultCM)) {
                 selectedCounterMeasures.add(new ElementSelectionDTO(defaultCM.getName(), true));
             } else {
                 selectedCounterMeasures.add(new ElementSelectionDTO(defaultCM.getName(), false));
@@ -74,44 +73,41 @@ public class SituationServiceREST {
 
     @PostMapping("/current/countermeasures")
     public void updateCounterMeasures(Principal principal, @RequestBody List<ElementSelectionDTO> currentSelection) {
-        Situation situation = getCurrentSituation(principal);
-        situation.getCounterMeasures().clear();
+        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
+        dailyRecord.getCounterMeasures().clear();
         for (ElementSelectionDTO elementSelectionDTO : currentSelection) {
             if (elementSelectionDTO.isSelected()) {
                 if (counterMeasureRepository.existsById(elementSelectionDTO.getName())) {
-                    situation.getCounterMeasures()
+                    dailyRecord.getCounterMeasures()
                             .add(counterMeasureRepository.findById(elementSelectionDTO.getName()).get());
                 } else {
                     CounterMeasure cm = new CounterMeasure();
                     cm.setName(elementSelectionDTO.getName());
                     cm.setDefault(false);
                     counterMeasureRepository.save(cm);
-                    situation.getCounterMeasures().add(cm);
+                    dailyRecord.getCounterMeasures().add(cm);
                 }
             }
         }
-        situationRepository.save(situation);
+        dailyRecordRepository.save(dailyRecord);
     }
 
     @GetMapping("/current/overview")
     public ResponseEntity<OverviewDTO> getOverview(Principal principal) {
-        Situation situation = getCurrentSituation(principal);
-        return new ResponseEntity<>(new OverviewDTO(situation), HttpStatus.OK);
+        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
+        return new ResponseEntity<>(new OverviewDTO(dailyRecord), HttpStatus.OK);
     }
 
     @GetMapping("/current/symptoms")
     public List<ElementSelectionDTO> getAllSymptoms(Principal principal) {
-        String loginName = principal.getName();
-        User user = userRepository.findById(loginName).get();
-        Situation situation = getCurrentSituation(principal);
-
+        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
         List<Symptom> symptoms = symptomRepository.findByIsDefault(true);
-        symptoms.addAll(symptomRepository.findOwnButNotDefault(user));
+       // symptoms.addAll(symptomRepository.findOwnButNotDefault(user));
 
         List<ElementSelectionDTO> selectedSymptoms = new ArrayList<>();
 
         for (Symptom symptom : symptoms) {
-            if (situation.getSymptoms().contains(symptom)) {
+            if (dailyRecord.getLatestSituation().getSymptoms().contains(symptom)) {
                 selectedSymptoms.add(new ElementSelectionDTO(symptom.getName(), true));
             } else {
                 selectedSymptoms.add(new ElementSelectionDTO(symptom.getName(), false));
@@ -136,54 +132,66 @@ public class SituationServiceREST {
         User user = userRepository.findById(loginName).get();
 
         Situation situation = new Situation();
-        situation.setDateTime(new Date());
         situation.setTimeOfDay(input.getTimeOfDay());
         situation.setPainLevel(input.getIntensity());
         situation.setStressLevel(input.getStressLevel());
         for (StressorSelectionDTO element : input.getStressors()) {
-            if(!element.isSelected()) continue;
-            Optional<Stressor> so = stressorRepository.findById(element.getName());    
-            if(so.isPresent()) {
+            if (!element.isSelected())
+                continue;
+            Optional<Stressor> so = stressorRepository.findById(element.getName());
+            if (so.isPresent()) {
                 situation.getStressors().add(so.get());
-            }
-            else {
+            } else {
                 Stressor s = new Stressor();
                 s.setName(element.getName());
                 s.setCategory("Custom");
                 stressorRepository.save(s);
                 situation.getStressors().add(s);
-            }        
+            }
         }
 
         for (ElementSelectionDTO element : input.getSymptoms()) {
-            if(!element.isSelected()) continue;
-            Optional<Symptom> so = symptomRepository.findById(element.getName());    
-            if(so.isPresent()) {
+            if (!element.isSelected())
+                continue;
+            Optional<Symptom> so = symptomRepository.findById(element.getName());
+            if (so.isPresent()) {
                 situation.getSymptoms().add(so.get());
-            }
-            else {
+            } else {
                 Symptom s = new Symptom();
                 s.setName(element.getName());
                 symptomRepository.save(s);
                 situation.getSymptoms().add(s);
-            }        
+            }
         }
 
         situationRepository.save(situation);
-        user.getSituations().add(situation);
-        userRepository.save(user);
-        
+
+        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        if (!sdf.format(dailyRecord.getDateTime()).equals(sdf.format(new Date()))) {
+            DailyRecord newRecord = new DailyRecord();
+            newRecord.setDateTime(new Date());
+            newRecord.getSituations().add(situation);
+            dailyRecordRepository.save(newRecord);
+            user.getRecords().add(newRecord);
+            userRepository.save(user);
+
+        } else {
+            dailyRecord.getSituations().add(situation);
+            dailyRecordRepository.save(dailyRecord);
+        }
     }
 
-    private Situation getCurrentSituation(Principal principal) {
+    private DailyRecord getCurrentDailyRecord(Principal principal) {
         String loginName = principal.getName();
         User user = userRepository.findById(loginName).get();
-        Situation situation = situationRepository.findMostRecentSituation(user);
+        DailyRecord situation = dailyRecordRepository.findMostRecentSituation(user);
 
         if (situation == null) {
-            situation = new Situation();
-            user.getSituations().add(situation);
-            situationRepository.save(situation);
+            situation = new DailyRecord();
+            user.getRecords().add(situation);
+            dailyRecordRepository.save(situation);
             userRepository.save(user);
         }
 

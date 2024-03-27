@@ -114,9 +114,6 @@ onMounted(() => {
    overflow-x:auto
  }
 
- .horizontal-scrollable>.row>.col-xs-4 {
-
- }
 
  /* Decorations */
 

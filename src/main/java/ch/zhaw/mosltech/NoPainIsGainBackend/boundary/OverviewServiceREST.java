@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.GraphDataDTO;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Situation;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.SituationRepository;
+import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecord;
+import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecordRepository;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.User;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.UserRepository;
 
@@ -23,7 +23,7 @@ public class OverviewServiceREST {
     private UserRepository userRepository;
 
     @Autowired
-    private SituationRepository situationRepository;
+    private DailyRecordRepository dailyRecordRepository;
 
     @GetMapping("/painPlot")
     private GraphDataDTO getPainData(Principal principal) {
@@ -31,11 +31,11 @@ public class OverviewServiceREST {
         String loginName = principal.getName();
         User user = userRepository.findById(loginName).get();
 
-        List<Situation> situations = situationRepository.findAllSiutationsOrdered(user);
+        List<DailyRecord> dailyRecords = dailyRecordRepository.findAllSiutationsOrdered(user);
         
-        for (Situation situation : situations) {
-            res.getLabels().add(situation.getDateTime().toString());
-            res.getData().add(situation.getPainLevel());
+        for (DailyRecord dailyRecord : dailyRecords) {
+            res.getLabels().add(dailyRecord.getDateTime().toString());            
+            res.getData().add(dailyRecord.getAveragePainLevel());
         }
 
         return res;
@@ -47,11 +47,11 @@ public class OverviewServiceREST {
         String loginName = principal.getName();
         User user = userRepository.findById(loginName).get();
 
-        List<Situation> situations = situationRepository.findAllSiutationsOrdered(user);
+         List<DailyRecord> dailyRecords = dailyRecordRepository.findAllSiutationsOrdered(user);
         
-        for (Situation situation : situations) {
-            res.getLabels().add(situation.getDateTime().toString());
-            res.getData().add(situation.getStressLevel());
+        for (DailyRecord dailyRecord : dailyRecords) {
+            res.getLabels().add(dailyRecord.getDateTime().toString());            
+            res.getData().add(dailyRecord.getAverageStressLevel());
         }
 
         return res;

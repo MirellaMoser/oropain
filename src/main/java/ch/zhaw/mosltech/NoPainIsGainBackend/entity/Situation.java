@@ -1,7 +1,6 @@
 package ch.zhaw.mosltech.NoPainIsGainBackend.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -11,8 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.Data;
 
 @Entity
@@ -23,10 +20,7 @@ public class Situation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateTime = new Date();
-
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private ETimeOfDay timeOfDay;
     
     private Integer painLevel;
@@ -37,8 +31,5 @@ public class Situation {
 
     @ManyToMany
     private List<Stressor> stressors = new ArrayList<>();
-
-    @ManyToMany
-    private List<CounterMeasure> counterMeasures = new ArrayList<>();
 
 }

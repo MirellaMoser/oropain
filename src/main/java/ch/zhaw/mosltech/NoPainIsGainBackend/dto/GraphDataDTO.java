@@ -8,7 +8,7 @@ import lombok.Value;
 @Value
 public class GraphDataDTO {
     private List<String> labels = new ArrayList<>();
-    private List<Integer> data  = new ArrayList<>();
+    private List<Double> data  = new ArrayList<>();
 
 }
 

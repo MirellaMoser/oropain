@@ -24,7 +24,7 @@ public class User {
 
     @OneToMany
     @Cascade(CascadeType.ALL)
-    private List<Situation> situations = new ArrayList<>();
+    private List<DailyRecord> records = new ArrayList<>();
     
 
 }
