@@ -1,71 +1,45 @@
 <template>
     <div>
         <div class="container-fluid pt-3">
-            <div class="card" style="width: 18rem;">
+            <div class="card">
                 <div class="card-header">
                     Schmerz-Intensität
                 </div>
-                <ul class="list-group list-group-flush">
-                    <div>
-                        <canvas id="pain-chart"></canvas>
-                    </div>
-                </ul>
-            </div>
-        </div>
-        <div class="container-fluid pt-3">
-            <div class="card" style="width: 18rem;">
-                <div class="card-header">
-                    Stress-Level
+                <div>
+                    <canvas id="pain-chart" width="600" height="400"></canvas>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <div>
-                        <canvas id="stress-chart"></canvas>
-                    </div>
-                </ul>
             </div>
         </div>
 
         <div class="container-fluid pt-3">
-            <div class="card" style="width: 18rem;">
+            <div class="card">
                 <div class="card-header">
                     Lebensbäume
                 </div>
-                <div class="container text-center">
-                    <div class="row">
-                        <div class="col">
-                            <img src="img/Baum2.svg" class="img-fluid" alt="...">
-                        </div>
-                        <div class="col">
-                            <img src="img/Baum3.svg" class="img-fluid" alt="...">
-                        </div>
-                        <div class="col">
-                            <img src="img/Baum3.svg" class="img-fluid" alt="...">
-                        </div>
-                    </div>
-                </div>
-                <div class="container text-center">
-                    <div class="row">
-                        <div class="col">
-                            <img src="img/Baum4.svg" class="img-fluid" alt="...">
-                        </div>
-                        <div class="col">
-                            <img src="img/Baum5.svg" class="img-fluid" alt="...">
-                        </div>
-                        <div class="col">
-                            <img src="img/Baum5.svg" class="img-fluid" alt="...">
-                        </div>
-                    </div>
-                </div>
-                <div class="container text-center">
-                    <div class="row">
-                        <div class="col">
-                            <img src="img/Baum2.svg" class="img-fluid" alt="...">
-                        </div>
-                        <div class="col">
-                            <img src="img/Baum4.svg" class="img-fluid" alt="...">
-                        </div>
-                        <div class="col">
-                            <img src="img/Baum1.svg" class="img-fluid" alt="...">
+                <div class="card-body" >
+                    <div class="container">
+                        <div class="row text-center" >
+                            <div class="col-xs-4">
+                                <img src="img/stress_small/tief_0.svg" width="100" />
+                            </div>
+                            <div class="col-xs-4" >
+                                <img src="img/stress_small/tief_0.svg" width="100" />
+                            </div>
+                            <div class="col-xs-4">
+                                <img src="img/stress_small/tief_0.svg" width="100" />
+                            </div>
+                            <div class="col-xs-4">
+                                <img src="img/stress_small/tief_0.svg" width="100" />
+                            </div>
+                            <div class="col-xs-4">
+                                <img src="img/stress_small/tief_0.svg" width="100" />
+                            </div>
+                            <div class="col-xs-4">
+                                <img src="img/stress_small/tief_0.svg" width="100" />
+                            </div>
+                            <div class="col-xs-4">
+                                <img src="img/stress_small/tief_0.svg" width="100" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -85,40 +59,76 @@ Chart.register(LineController, LineElement, PointElement, LinearScale, Title, Ca
 
 
 onMounted(() => {
-    axios.get('/api/overview/painPlot').then(response => {
-        let data = response.data;
-        new Chart(document.getElementById('pain-chart'), {
-            type: "line",
-            data: {
-                labels: data.labels,
-                datasets: [
-                    {
-                        label: "Pain",
-                        data: data.data
+    axios.get('/api/overview/painPlot').then(responsePain => {
+        let pain = responsePain.data;
+        axios.get('/api/overview/stressPlot').then(responseStress => {
+            let stress = responseStress.data;
+            Chart.defaults.plugins.legend = {
+                enabled: true
+            };
+            new Chart(document.getElementById('pain-chart'), {
+                type: "line",
+                data: {
+                    labels: pain.labels,
+                    datasets: [
+                        {
+                            label: "Pain",
+                            data: pain.data,
+                            borderColor: "red"
+                        },
+                        {
+                            label: "Stress",
+                            data: stress.data,
+                            borderColor: "blue"
+                        }
+                    ]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: true, // This makes sure the legend is displayed
+                            position: 'bottom', // This positions the legend at the bottom of the chart
+                            labels: {
+                                font: { // This customizes the legend's label font
+                                    size: 14,
+                                    weight: 'italic'
+                                },
+                                padding: 10 // Moved padding outside of font, directly under labels
+                            }
+                        }
                     }
-                ]
-            }
-        })
-    });
+                }
+            })
+        });
 
-    axios.get('/api/overview/stressPlot').then(response => {
-        let data = response.data;
-        new Chart(document.getElementById('stress-chart'), {
-            type: "line",
-            data: {
-                labels: data.labels,
-                datasets: [
-                    {
-                        label: "Stress",
-                        data: data.data
-                    }
-                ]
-            }
-        })
     });
-
 });
 
 
 
 </script>
+
+<style> /* The heart of the matter */
+
+ .horizontal-scrollable>.row {
+   overflow-x:auto
+ }
+
+ .horizontal-scrollable>.row>.col-xs-4 {
+
+ }
+
+ /* Decorations */
+
+ .col-xs-4 {
+     max-width: 130px;
+ }
+
+ .col-xs-4:nth-child(2n+1) {
+     background: green;
+ }
+
+ .col-xs-4:nth-child(2n+2) {
+     background: black;
+ }
+</style> 

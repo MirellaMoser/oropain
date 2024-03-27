@@ -12,7 +12,6 @@
                     Schmerz-Intensität
                     <span>
                         <select class="form-select" aria-label="Default select example" v-model="selectionModel.intensity">
-                            <option value="-1">keine Angabe</option>
                             <option value="0">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -43,29 +42,24 @@
                     <span>
                         <select class="form-select" aria-label="Default select example"
                             v-model="selectionModel.stressLevel">
-                            <option value="-1">keine Angabe</option>
-                            <option value="0">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
+                            <option value="0">kein</option>
+                            <option value="1">tief</option>
+                            <option value="2">mittel</option>
+                            <option value="3">hoch</option>                            
                         </select>
                     </span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Stressoren
                     <span>
-                        <div class="form-check" v-bind:key="cm.name" v-for="cm in selectionModel.stressors">
-                            <input class="form-check-input" type="checkbox" v-model="cm.selected" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{ cm.name }}
-                            </label>
+                        <div v-bind:key="category" v-for="category in stressorSelectModel.keys()">
+                            <b>{{ category }}</b>
+                            <div class="form-check" v-bind:key="cm.name" v-for="cm in stressorSelectModel.get(category)">
+                                <input class="form-check-input" type="checkbox" v-model="cm.selected" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    {{ cm.name }}
+                                </label>
+                            </div>
                         </div>
                     </span>
                 </li>
@@ -77,7 +71,6 @@
                             <option value="MORNING">Morgen</option>
                             <option value="AFTERNOON">Nachmittag</option>
                             <option value="EVENING">Abend</option>
-                            <option value="NIGHT">Nacht</option>
                         </select></span>
                 </li>
             </ul>
@@ -94,14 +87,37 @@
 import { ref, onMounted } from 'vue';
 
 const selectionModel = ref([]);
+const stressorSelectModel = ref(new Map());
 
 onMounted(() => {
     axios.get('/api/situation/new/empty').then(response => {
         selectionModel.value = response.data;
+
+
+
+
+        response.data.stressors.forEach(stressor => {
+            if (!stressorSelectModel.value.has(stressor.category)) {
+                stressorSelectModel.value.set(stressor.category, []);
+            }
+            stressorSelectModel.value.get(stressor.category).push(stressor);
+
+        });
+        
     });
 });
 
 const saveSituation = () => {
+
+    const symtomsSelected = [];
+        stressorSelectModel.value.forEach((value,key) => {            
+            stressorSelectModel.value.get(key).forEach(stressor => {            
+            symtomsSelected.push(stressor);
+        });  
+    });         
+    selectionModel.value.stressors = symtomsSelected;
+
+    
     axios.post('/api/situation', selectionModel.value).then(response => {
         window.location.href = '#/';
     });

@@ -11,7 +11,7 @@ public class InputDTO {
  private int intensity;
     private List<ElementSelectionDTO> symptoms;
     private int stressLevel;
-    private List<ElementSelectionDTO> stressors;
+    private List<StressorSelectionDTO> stressors;
     private Date dateOfEntry;
     private ETimeOfDay timeOfDay;
 }

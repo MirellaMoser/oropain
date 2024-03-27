@@ -36,20 +36,13 @@ public class OverviewDTO {
                 this.stressLevel = "kein";
                 break;
             case 1:
-            case 2:
-            case 3:
                 this.stressLevel = "tief";
                 break;
-            case 4:
-            case 5:
-            case 6:
-            case 7:
+            case 2:
                 this.stressLevel = "mittel";
                 break;
-            case 8:
-            case 9:
-            case 10:
-                this.stressLevel = "hoch";
+            case 3:
+                 this.stressLevel = "hoch";
                 break;
             default:
                 this.stressLevel = "kein";

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.ElementSelectionDTO;
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.InputDTO;
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.OverviewDTO;
+import ch.zhaw.mosltech.NoPainIsGainBackend.dto.StressorSelectionDTO;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.CounterMeasure;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.CounterMeasureRepository;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.ETimeOfDay;
@@ -124,9 +125,9 @@ public class SituationServiceREST {
     public InputDTO getNewEntrySituation(Principal principal) {
 
         List<ElementSelectionDTO> defaultSymptoms = getDefaultSymptoms();
-        List<ElementSelectionDTO> defaultStressors = getDefaultStressors();
+        List<StressorSelectionDTO> defaultStressors = getDefaultStressors();
 
-        return new InputDTO(-1, defaultSymptoms, -1, defaultStressors, new Date(), ETimeOfDay.UNSET);
+        return new InputDTO(0, defaultSymptoms, 0, defaultStressors, new Date(), ETimeOfDay.UNSET);
     }
 
     @PostMapping
@@ -139,7 +140,7 @@ public class SituationServiceREST {
         situation.setTimeOfDay(input.getTimeOfDay());
         situation.setPainLevel(input.getIntensity());
         situation.setStressLevel(input.getStressLevel());
-        for (ElementSelectionDTO element : input.getStressors()) {
+        for (StressorSelectionDTO element : input.getStressors()) {
             if(!element.isSelected()) continue;
             Optional<Stressor> so = stressorRepository.findById(element.getName());    
             if(so.isPresent()) {
@@ -148,6 +149,7 @@ public class SituationServiceREST {
             else {
                 Stressor s = new Stressor();
                 s.setName(element.getName());
+                s.setCategory("Custom");
                 stressorRepository.save(s);
                 situation.getStressors().add(s);
             }        
@@ -200,13 +202,13 @@ public class SituationServiceREST {
         return defaultSelection;
     }
 
-    private List<ElementSelectionDTO> getDefaultStressors() {
+    private List<StressorSelectionDTO> getDefaultStressors() {
 
-        List<ElementSelectionDTO> defaultSelection = new ArrayList<>();
+        List<StressorSelectionDTO> defaultSelection = new ArrayList<>();
 
         List<Stressor> defaultStressors = stressorRepository.findByIsDefault(true);
-        for (Stressor symptom : defaultStressors) {
-            defaultSelection.add(new ElementSelectionDTO(symptom.getName(), false));
+        for (Stressor stressor : defaultStressors) {
+            defaultSelection.add(new StressorSelectionDTO(stressor.getName(), stressor.getCategory(), false));
         }
 
         return defaultSelection;
