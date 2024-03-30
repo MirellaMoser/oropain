@@ -4,14 +4,15 @@
             <div class="card-header">
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Meine Angaben
-                    <input type="date" class="form-control" id="dateInput" name="date" value="2024-03-01">
                 </li>
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Schmerz-Intensität
-                    <span>
-                        <select class="form-select" aria-label="Default select example" v-model="selectionModel.intensity">
+                <li class="list-group-item">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            Schmerz-Intensität</div>
+                        <select class="form-select" aria-label="Default select example"
+                            v-model="selectionModel.intensity">
                             <option value="0">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -24,38 +25,44 @@
                             <option value="9">9</option>
                             <option value="10">10</option>
                         </select>
-                    </span>
+                    </div>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Symptome
-                    <span>
-                        <div class="form-check" v-bind:key="cm.name" v-for="cm in selectionModel.symptoms">
-                            <input class="form-check-input" type="checkbox" v-model="cm.selected" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{ cm.name }}
-                            </label>
+                <li class="list-group-item">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">Symptome</div>
+                        <div>
+                            <div class="form-check" v-bind:key="cm.name" v-for="cm in selectionModel.symptoms">
+                                <input class="form-check-input" type="checkbox" v-model="cm.selected"
+                                    id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    {{ cm.name }}
+                                </label>
+                            </div>
                         </div>
-                    </span>
+                    </div>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Stress-Level
-                    <span>
+                <li class="list-group-item">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            Stress-Level</div>
                         <select class="form-select" aria-label="Default select example"
                             v-model="selectionModel.stressLevel">
                             <option value="0">kein</option>
                             <option value="1">tief</option>
                             <option value="2">mittel</option>
-                            <option value="3">hoch</option>                            
+                            <option value="3">hoch</option>
                         </select>
-                    </span>
+                    </div>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     Stressoren
                     <span>
                         <div v-bind:key="category" v-for="category in stressorSelectModel.keys()">
                             <b>{{ category }}</b>
-                            <div class="form-check" v-bind:key="cm.name" v-for="cm in stressorSelectModel.get(category)">
-                                <input class="form-check-input" type="checkbox" v-model="cm.selected" id="flexCheckDefault">
+                            <div class="form-check" v-bind:key="cm.name"
+                                v-for="cm in stressorSelectModel.get(category)">
+                                <input class="form-check-input" type="checkbox" v-model="cm.selected"
+                                    id="flexCheckDefault">
                                 <label class="form-check-label" for="flexCheckDefault">
                                     {{ cm.name }}
                                 </label>
@@ -63,15 +70,19 @@
                         </div>
                     </span>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    Zeitpunkt
-                    <span><select class="form-select" v-model="selectionModel.timeOfDay"
+                <li class="list-group-item">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            Zeitpunkt
+                        </div>
+                        <select class="form-select" v-model="selectionModel.timeOfDay"
                             aria-label="Default select example">
                             <option value="UNSET">keine Angabe</option>
                             <option value="MORNING">Morgen</option>
                             <option value="AFTERNOON">Nachmittag</option>
                             <option value="EVENING">Abend</option>
-                        </select></span>
+                        </select></select>
+                    </div>
                 </li>
             </ul>
             <div class="card-footer">
@@ -103,21 +114,21 @@ onMounted(() => {
             stressorSelectModel.value.get(stressor.category).push(stressor);
 
         });
-        
+
     });
 });
 
 const saveSituation = () => {
 
     const symtomsSelected = [];
-        stressorSelectModel.value.forEach((value,key) => {            
-            stressorSelectModel.value.get(key).forEach(stressor => {            
+    stressorSelectModel.value.forEach((value, key) => {
+        stressorSelectModel.value.get(key).forEach(stressor => {
             symtomsSelected.push(stressor);
-        });  
-    });         
+        });
+    });
     selectionModel.value.stressors = symtomsSelected;
 
-    
+
     axios.post('/api/situation', selectionModel.value).then(response => {
         window.location.href = '#/';
     });
