@@ -2,7 +2,7 @@
     <div>
         <div class="container-fluid pt-3">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header" style="background-color: grey;">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Meine Angaben
                         <span>{{ overview.dateOfEntry }}</span>
@@ -34,13 +34,13 @@
                         <span v-if="overview.timeOfEntry === 'NIGHT'">Nacht</span>
                     </li>
                 </ul>
-                <div style="position:relative;">
-                    <div style="position: absolute;">
+                <div style="position:relative; text-align: center;">
+                    <div style="position: absolute; left: 50%; top: 0px; transform: translateX(-50%);">
                         <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
                             <img :src="imagePath" style="width: 100%; max-width: 100%;">
                         </a>
                     </div>
-                    <div style="position: absolute; top: 0px;">
+                    <div style="position: absolute; left: 50%; top: 0px; transform: translateX(-50%);">
                         <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
                             <img :src="overlayPath" style="width: 100%; max-width: 100%;">
                         </a>
@@ -49,11 +49,13 @@
             </div>
         </div>
 
-        <div class="modal fade" id="baumerweiterung" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="baumerweiterung" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Lebensbaum erweitern und Massnahmen hinzufügen
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Lebensbaum erweitern und Massnahmen
+                            hinzufügen
                         </h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -66,9 +68,9 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
                         <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-                            @click="saveCountermeasures">Save changes</button>
+                            @click="saveCountermeasures">Speichern</button>
                     </div>
                 </div>
             </div>
@@ -109,7 +111,7 @@ const updateOverviewImage = () => {
     var selectedCms = 0;
 
     var intensityRounded = Math.round(overview.value.intensity);
-    
+
     for (const cm of countermeasuresOptions.value) {
         if (cm.selected) selectedCms++;
     }
