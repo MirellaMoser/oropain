@@ -1,15 +1,19 @@
 insert into USER_TABLE (LOGIN_NAME, PASSWORD_HASH) values ('user', '$2a$10$TI3vcVwae772ZW1W9ZkDPe4x/n/CV/G8Q.dXI9TtHwVa/FjIX3iw2');
 
 
-insert into DAILY_RECORD(DATE_TIME) values ('20240327');
+insert into DAILY_RECORD(DATE_TIME) values ('20240401');
+insert into DAILY_RECORD(DATE_TIME) values ('20240402');
 
 insert into SITUATION(PAIN_LEVEL, STRESS_LEVEL, TIME_OF_DAY) values (2,1,1);
 insert into SITUATION(PAIN_LEVEL, STRESS_LEVEL, TIME_OF_DAY) values (3,2,2);
+insert into SITUATION(PAIN_LEVEL, STRESS_LEVEL, TIME_OF_DAY) values (7,3,3);
 
 insert into DAILY_RECORD_SITUATIONS(DAILY_RECORD_ID, SITUATIONS_ID) values (1,1);
 insert into DAILY_RECORD_SITUATIONS(DAILY_RECORD_ID, SITUATIONS_ID) values (1,2);
+insert into DAILY_RECORD_SITUATIONS(DAILY_RECORD_ID, SITUATIONS_ID) values (2,3);
 
 insert into USER_TABLE_RECORDS(RECORDS_ID, USER_LOGIN_NAME) values (1,'user');
+insert into USER_TABLE_RECORDS(RECORDS_ID, USER_LOGIN_NAME) values (2,'user');
 
 
 insert into STRESSOR (NAME,CATEGORY, IS_DEFAULT) values ('Lärm', 'Physikalisch-sensorisch', true); 
