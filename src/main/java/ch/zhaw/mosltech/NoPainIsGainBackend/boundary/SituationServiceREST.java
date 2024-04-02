@@ -2,6 +2,7 @@ package ch.zhaw.mosltech.NoPainIsGainBackend.boundary;
 
 import java.security.Principal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -102,7 +103,7 @@ public class SituationServiceREST {
     public List<ElementSelectionDTO> getAllSymptoms(Principal principal) {
         DailyRecord dailyRecord = getCurrentDailyRecord(principal);
         List<Symptom> symptoms = symptomRepository.findByIsDefault(true);
-       // symptoms.addAll(symptomRepository.findOwnButNotDefault(user));
+        // symptoms.addAll(symptomRepository.findOwnButNotDefault(user));
 
         List<ElementSelectionDTO> selectedSymptoms = new ArrayList<>();
 
@@ -122,8 +123,21 @@ public class SituationServiceREST {
 
         List<ElementSelectionDTO> defaultSymptoms = getDefaultSymptoms();
         List<StressorSelectionDTO> defaultStressors = getDefaultStressors();
+        List<ETimeOfDay> availableEntries = new ArrayList<>();
+        availableEntries.add(ETimeOfDay.MORNING);
+        availableEntries.add(ETimeOfDay.AFTERNOON);
+        availableEntries.add(ETimeOfDay.EVENING);
 
-        return new InputDTO(0, defaultSymptoms, 0, defaultStressors, new Date(), ETimeOfDay.UNSET);
+        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        if (sdf.format(dailyRecord.getDateTime()).equals(sdf.format(new Date()))) {
+            for (Situation situation : dailyRecord.getSituations()) {
+                availableEntries.remove(situation.getTimeOfDay());
+            }
+        }
+
+        return new InputDTO(0, defaultSymptoms, 0, defaultStressors, new Date(), ETimeOfDay.MORNING, availableEntries);
     }
 
     @PostMapping

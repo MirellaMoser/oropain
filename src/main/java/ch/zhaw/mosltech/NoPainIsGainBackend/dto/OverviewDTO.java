@@ -26,7 +26,7 @@ public class OverviewDTO {
             stressLevel ="kein";
             stressors = "";
             dateOfEntry = new Date();
-            timeOfEntry = ETimeOfDay.UNSET;
+            timeOfEntry = ETimeOfDay.MORNING;
             return;
         }
         this.intensity = record.getLatestSituation().getPainLevel();

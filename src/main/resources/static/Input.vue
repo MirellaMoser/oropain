@@ -1,6 +1,6 @@
 <template>
-    <div class="container-fluid pt-3">
-        <div class="card">
+    <div class="container-fluid pt-3" >
+        <div class="card" v-if="availabelTimeSlots.length != 0">
             <div class="card-header" style="background-color: grey;">
                 Meine Angaben
             </div>
@@ -8,10 +8,7 @@
                 <div class="mb-3">
                     <label for="timeOfDay" class="form-label" style="font-weight: 500;">Zeitpunkt</label>
                     <select class="form-select" v-model="selectionModel.timeOfDay" aria-label="Default select example">
-                        <option value="UNSET">keine Angabe</option>
-                        <option value="MORNING">Morgen</option>
-                        <option value="AFTERNOON">Nachmittag</option>
-                        <option value="EVENING">Abend</option>
+                        <option v-bind:key="i" v-for="i in availabelTimeSlots" :value="i.value">{{ i.label }}</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -41,8 +38,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="stressLevel" class="form-label" style="font-weight: 500;">Stress-Level</label>
-                    <select class="form-select" aria-label="Default select example"
-                        v-model="selectionModel.stressLevel">
+                    <select class="form-select" aria-label="Default select example" v-model="selectionModel.stressLevel">
                         <option value="0">kein</option>
                         <option value="1">tief</option>
                         <option value="2">mittel</option>
@@ -63,28 +59,49 @@
                 </div>
                 <div class="card-footer">
                     <div class="d-flex justify-content-between align-items-center">
-                        <button type="button" class="btn btn-primary" style="background-color: lightseagreen;border-color: lightseagreen; outline: none;" @click="saveSituation">Eingaben speichern</button>
+                        <button type="button" class="btn btn-primary"
+                            style="background-color: lightseagreen;border-color: lightseagreen; outline: none;"
+                            @click="saveSituation">Eingaben speichern</button>
                     </div>
                 </div>
             </div>
         </div>
+        <div v-if="!availabelTimeSlots.length">
+            Keine weiteren Einträge für diesen Tag möglich.
+        </div>
     </div>
-
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 
 const selectionModel = ref([]);
+const availabelTimeSlots = ref([]);
 const stressorSelectModel = ref(new Map());
 
 onMounted(() => {
     axios.get('/api/situation/new/empty').then(response => {
         selectionModel.value = response.data;
+        debugger;
 
+        availabelTimeSlots.value = selectionModel.value.availableEntries.map(element => {
+            if (element === 'MORNING')
+                return { label: 'Morgen', value: element };
+            else if (element === 'AFTERNOON')
+                return { label: 'Nachmittag', value: element };
+            else if (element === 'EVENING')
+                return { label: 'Abend', value: element };
+            else {
+                return element;
+            }
+        }
+        );
 
+        if(availabelTimeSlots.value.length > 0) {
+            selectionModel.value.timeOfDay = availabelTimeSlots.value[0].value;
+        }
 
-
+        
         response.data.stressors.forEach(stressor => {
             if (!stressorSelectModel.value.has(stressor.category)) {
                 stressorSelectModel.value.set(stressor.category, []);
@@ -105,7 +122,6 @@ const saveSituation = () => {
         });
     });
     selectionModel.value.stressors = symtomsSelected;
-
 
     axios.post('/api/situation', selectionModel.value).then(response => {
         window.location.href = '#/';

@@ -1,7 +1,7 @@
 package ch.zhaw.mosltech.NoPainIsGainBackend.entity;
 
 public enum ETimeOfDay {
-    MORNING(1),AFTERNOON(2),EVENING(3),UNSET(0);
+    MORNING(1),AFTERNOON(2),EVENING(3);
 
     private final int value;
     private ETimeOfDay(int value) {
