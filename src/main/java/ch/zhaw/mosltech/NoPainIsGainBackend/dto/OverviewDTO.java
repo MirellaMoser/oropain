@@ -10,7 +10,7 @@ import lombok.Value;
 
 @Value
 public class OverviewDTO {
-    private Double intensity;
+    private Integer intensity;
     private String symptoms;
     private String stressLevel;
     private String stressors;
@@ -21,7 +21,7 @@ public class OverviewDTO {
 
     public OverviewDTO(DailyRecord record) {
         if(record.getSituations().size() == 0) {
-            intensity = 0.0;
+            intensity = 0;
             symptoms = "";
             stressLevel ="kein";
             stressors = "";
@@ -29,7 +29,7 @@ public class OverviewDTO {
             timeOfEntry = ETimeOfDay.UNSET;
             return;
         }
-        this.intensity = record.getAveragePainLevel();
+        this.intensity = record.getLatestSituation().getPainLevel();
         
         String symptomsAggregated = "";
         for (Symptom s : record.getLatestSituation().getSymptoms()) {
