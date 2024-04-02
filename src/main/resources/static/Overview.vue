@@ -3,7 +3,8 @@
         <div class="container-fluid pt-3">
             <div class="card">
                 <div class="card-header">
-                    Schmerz-Intensität
+                    Übersicht Schmerz <span style="color: red;">(rot)</span> und Stress <span
+                        style="color: blue;">(blau)</span>
                 </div>
                 <div>
                     <canvas id="pain-chart" width="600" height="400"></canvas>
@@ -42,14 +43,14 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Ihr toller Baum
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Ihr Lebensbaum
                         </h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         {{ currentTreeDescriptor.date }}
-                        <div>
-                            <table class="table">
+                        <div class="table-responsive">
+                            <table class="table" style="font-size: 11px;">
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -59,30 +60,34 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <th scope="row">Schmerzintsnsität</th>
-                                        <td v-for="situation in currentTreeDescriptor.situations" v-bind:key="situation">
+                                        <th scope="row">Schmerz-Intensität</th>
+                                        <td v-for="situation in currentTreeDescriptor.situations"
+                                            v-bind:key="situation">
                                             {{ situation.painLevel }}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">Stresslevel</th>
-                                        <td v-for="situation in currentTreeDescriptor.situations" v-bind:key="situation">
+                                        <th scope="row">Stress-Level</th>
+                                        <td v-for="situation in currentTreeDescriptor.situations"
+                                            v-bind:key="situation">
                                             {{ situation.stressLevel }}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Symptome</th>
-                                        <td v-for="situation in currentTreeDescriptor.situations" v-bind:key="situation">
-                                            <ul>
+                                        <td v-for="situation in currentTreeDescriptor.situations"
+                                            v-bind:key="situation">
+                                            <ul style="list-style-type: none; padding-left: 0; margin-left: 0;">
                                                 <li v-for="symptom in situation.symptoms" v-bind:key="symptom">{{
-                                                    symptom.name }}</li>
+                                symptom.name }}</li>
                                             </ul>
                                         </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Stressoren</th>
-                                        <td v-for="situation in currentTreeDescriptor.situations" v-bind:key="situation">
-                                            <ul>
+                                        <td v-for="situation in currentTreeDescriptor.situations"
+                                            v-bind:key="situation">
+                                            <ul style="list-style-type: none; padding-left: 0; margin-left: 0;">
                                                 <li v-for="stressor in situation.stressors" v-bind:key="stressor">{{
-                                                    stressor.name }}</li>
+                                stressor.name }}</li>
                                             </ul>
                                         </td>
                                     </tr>
@@ -93,7 +98,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schliessen</button>
+                    <button type="button" class="btn btn-primary"
+                        style="background-color: lightseagreen; border-color: lightseagreen; outline: none;"
+                        data-bs-dismiss="modal">Schliessen</button>
                 </div>
             </div>
         </div>
@@ -227,7 +234,8 @@ const modalTreeClicked = (tree) => {
 
 </script>
 
-<style> /* The heart of the matter */
+<style>
+ /* The heart of the matter */
 
  .horizontal-scrollable>.row {
      overflow-x: auto
@@ -238,4 +246,5 @@ const modalTreeClicked = (tree) => {
 
  .col-xs-4 {
      max-width: 130px;
- }</style> 
+ }
+</style>
