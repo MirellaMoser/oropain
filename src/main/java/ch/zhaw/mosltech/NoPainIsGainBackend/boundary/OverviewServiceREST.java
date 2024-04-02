@@ -17,7 +17,6 @@ import ch.zhaw.mosltech.NoPainIsGainBackend.entity.UserRepository;
 @RestController
 @RequestMapping("/api/overview")
 public class OverviewServiceREST {
-    
 
     @Autowired
     private UserRepository userRepository;
@@ -32,9 +31,9 @@ public class OverviewServiceREST {
         User user = userRepository.findById(loginName).get();
 
         List<DailyRecord> dailyRecords = dailyRecordRepository.findAllSiutationsOrdered(user);
-        
+
         for (DailyRecord dailyRecord : dailyRecords) {
-            res.getLabels().add(dailyRecord.getDateTime().toString());            
+            res.getLabels().add(dailyRecord.getDateTime().toString());
             res.getData().add(dailyRecord.getAveragePainLevel());
         }
 
@@ -47,13 +46,22 @@ public class OverviewServiceREST {
         String loginName = principal.getName();
         User user = userRepository.findById(loginName).get();
 
-         List<DailyRecord> dailyRecords = dailyRecordRepository.findAllSiutationsOrdered(user);
-        
+        List<DailyRecord> dailyRecords = dailyRecordRepository.findAllSiutationsOrdered(user);
+
         for (DailyRecord dailyRecord : dailyRecords) {
-            res.getLabels().add(dailyRecord.getDateTime().toString());            
+            res.getLabels().add(dailyRecord.getDateTime().toString());
             res.getData().add(dailyRecord.getAverageStressLevel());
         }
 
         return res;
     }
+
+    @GetMapping("/dailyRecords")
+    private List<DailyRecord> getDailyRecords(Principal principal) {
+        String loginName = principal.getName();
+        User user = userRepository.findById(loginName).get();
+        List<DailyRecord> dailyRecords = dailyRecordRepository.findAllSiutationsOrdered(user);
+        return dailyRecords;
+    }
+
 }
