@@ -23,14 +23,14 @@
                             <div class="col-xs-4" v-for="tree in treeDescriptor" v-bind:key="tree">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#treeinfo"
                                     v-on:click.prevent="modalTreeClicked(tree)">
-                                    <div style="height:100px;">
-                                        <img :src="tree.imagePath" style="width: 100%; max-width: 100%;" />
+                                    <div style="height:100px; position: relative;">
+                                        <img :src="tree.imagePath"
+                                            style="height: 100%; max-width: 100%; position: absolute; top: 0; left: 0;" />
                                         <img :src="tree.overlayPath"
-                                            style="width: 100%; max-width: 100%; transform: translateY(-100%);" />
+                                            style="height: 100%; max-width: 100%; position: absolute; top: 0; left: 0;" />
                                     </div>
                                 </a>
-                                {{ tree.date }}
-
+                                <div style="margin-top: 5px;">{{ tree.date }}</div>
                             </div>
                         </div>
                     </div>
@@ -235,16 +235,16 @@ const modalTreeClicked = (tree) => {
 </script>
 
 <style>
- /* The heart of the matter */
+/* The heart of the matter */
 
- .horizontal-scrollable>.row {
-     overflow-x: auto
- }
+.horizontal-scrollable>.row {
+    overflow-x: auto
+}
 
 
- /* Decorations */
+/* Decorations */
 
- .col-xs-4 {
-     max-width: 130px;
- }
+.col-xs-4 {
+    max-width: 130px;
+}
 </style>

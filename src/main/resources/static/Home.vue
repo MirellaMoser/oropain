@@ -10,6 +10,14 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Zeitpunkt
+                        <span v-if="overview.timeOfEntry === 'UNSET'">Keine Angabe</span>
+                        <span v-if="overview.timeOfEntry === 'MORNING'">Morgen</span>
+                        <span v-if="overview.timeOfEntry === 'AFTERNOON'">Nachmittag</span>
+                        <span v-if="overview.timeOfEntry === 'EVENING'">Abend</span>
+                        <span v-if="overview.timeOfEntry === 'NIGHT'">Nacht</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
                         Schmerz-Intensität
                         <span>{{ overview.intensity }}</span>
                     </li>
@@ -25,16 +33,9 @@
                         Stressoren
                         <span>{{ overview.stressors }}</span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Zeitpunkt
-                        <span v-if="overview.timeOfEntry === 'UNSET'">Keine Angabe</span>
-                        <span v-if="overview.timeOfEntry === 'MORNING'">Morgen</span>
-                        <span v-if="overview.timeOfEntry === 'AFTERNOON'">Nachmittag</span>
-                        <span v-if="overview.timeOfEntry === 'EVENING'">Abend</span>
-                        <span v-if="overview.timeOfEntry === 'NIGHT'">Nacht</span>
-                    </li>
                 </ul>
-                <div style="position:relative; text-align: center;">
+            </div>
+            <div style="position:relative; text-align: center; margin-top: 20px;">
                     <div style="position: absolute; left: 50%; top: 0px; transform: translateX(-50%);">
                         <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
                             <img :src="imagePath" style="width: 100%; max-width: 100%;">
@@ -46,7 +47,6 @@
                         </a>
                     </div>
                 </div>
-            </div>
         </div>
 
         <div class="modal fade" id="baumerweiterung" tabindex="-1" aria-labelledby="exampleModalLabel"
