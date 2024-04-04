@@ -2,25 +2,44 @@
 <html>
 
 <head>
+  <!-- Meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Title -->
   <title>Bootstrap demo</title>
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1/font/bootstrap-icons.min.css">
+  <!-- Import Map for JavaScript modules -->
+  <script type="importmap">
+    {
+      "imports": {
+        "bootstrap-bundle": "https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js",
+        "vue": "https://cdn.jsdelivr.net/npm/vue@3/dist/vue.runtime.esm-browser.js",
+        "vue-router": "https://cdn.jsdelivr.net/npm/vue-router@4/+esm",
+        "vue3-sfc-loader": "https://cdn.jsdelivr.net/npm/vue3-sfc-loader@0.9/dist/vue3-sfc-loader.esm.js",
+        "vue-axios": "https://cdn.jsdelivr.net/npm/vue-axios@3/dist/vue-axios.esm.min.js",
+        "axios": "https://cdn.jsdelivr.net/npm/axios@1/dist/axios.min.js",
+        "chart.js": "https://cdn.jsdelivr.net/npm/chart.js@4/+esm"
+      }
+    }
+  </script>
 </head>
 
 <body>
 
-  
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
-    import * as Vue from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.runtime.esm-browser.js'
-    import * as vueRouter from 'https://cdn.jsdelivr.net/npm/vue-router@4/+esm'
-    import { loadModule } from 'https://cdn.jsdelivr.net/npm/vue3-sfc-loader@0.9/dist/vue3-sfc-loader.esm.js'
-    import VueAxios from 'https://cdn.jsdelivr.net/npm/vue-axios@3/dist/vue-axios.esm.min.js'
-    import * as axios from 'https://cdn.jsdelivr.net/npm/axios@1/dist/axios.min.js'
-    import * as chartjs from 'https://cdn.jsdelivr.net/npm/chart.js@4/+esm'
+    // Importing necessary modules and libraries
+    import 'bootstrap-bundle';
+    import * as Vue from 'vue';
+    import * as vueRouter from 'vue-router';
+    import { loadModule } from 'vue3-sfc-loader';
+    import VueAxios from 'vue-axios';
+    import * as axios from 'axios';
+    import * as chartjs from 'chart.js';
 
+    // Options for Vue application initialization
     const options = {
       moduleCache: {
         vue: Vue,
@@ -28,15 +47,18 @@
         chartjs: chartjs,
       },
       async getFile(url) {
+        // Asynchronously fetches files
         return (await fetch(url)).text();
       },
       addStyle(textContent) {
+        // Dynamically adds styles to the document head
         const style = Object.assign(document.createElement('style'), { textContent });
         const ref = document.head.getElementsByTagName('style')[0] || null;
         document.head.insertBefore(style, ref);
       },
     };
 
+    // Create Vue app and mount it to the document body
     Vue.createApp(Vue.defineAsyncComponent(() => loadModule("./App.vue", options))).mount(document.body);
   </script>
 </body>

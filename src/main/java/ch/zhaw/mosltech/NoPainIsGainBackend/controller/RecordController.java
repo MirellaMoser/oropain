@@ -17,6 +17,11 @@ import ch.zhaw.mosltech.NoPainIsGainBackend.entity.User;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.UserRepository;
 import ch.zhaw.mosltech.NoPainIsGainBackend.exceptions.EntityNotFoundException;
 
+/**
+ * Service class for handling operations related to user records.
+ * It facilitates fetching and updating of daily health records and countermeasure selections,
+ * and also generating an overview of the daily health status.
+ */
 @Service
 public class RecordController {
 
@@ -29,74 +34,127 @@ public class RecordController {
     @Autowired
     private DailyRecordRepository dailyRecordRepository;
 
-    public List<ElementSelectionDTO> getCountermeasureSelectionForCurrentRecord(String loginanme)
+    /**
+     * Retrieves a list of countermeasure selections for the current record of a given user.
+     * 
+     * @param loginName The username of the user whose record is being queried.
+     * @return A list of {@link ElementSelectionDTO} representing the selected countermeasures.
+     * @throws EntityNotFoundException If the daily record or user cannot be found.
+     */
+    public List<ElementSelectionDTO> getCountermeasureSelectionForCurrentRecord(String loginName)
             throws EntityNotFoundException {
-        DailyRecord dailyRecord = getCurrentDailyRecord(loginanme);
+        // Fetch the current daily record for the given username.
+        DailyRecord dailyRecord = getCurrentDailyRecord(loginName);
+
+        // Retrieve all default countermeasures from the database.
         List<CounterMeasure> defaultCounterMeasures = counterMeasureRepository.findAllByIsDefault(true);
         List<ElementSelectionDTO> selectedCounterMeasures = new ArrayList<>();
+
+        // Iterate over each default countermeasure and check if it is selected in the current daily record.
         for (CounterMeasure defaultCM : defaultCounterMeasures) {
-            if (dailyRecord.getCounterMeasures().contains(defaultCM)) {
-                selectedCounterMeasures.add(new ElementSelectionDTO(defaultCM.getName(), true));
-            } else {
-                selectedCounterMeasures.add(new ElementSelectionDTO(defaultCM.getName(), false));
-            }
+            boolean isSelected = dailyRecord.getCounterMeasures().contains(defaultCM);
+            selectedCounterMeasures.add(new ElementSelectionDTO(defaultCM.getName(), isSelected));
         }
+
         return selectedCounterMeasures;
     }
 
+    /**
+     * Updates the countermeasure selections for the current record of a given user.
+     * 
+     * @param loginName The username of the user whose record is to be updated.
+     * @param updatedSelection A list of {@link ElementSelectionDTO} representing the updated selections.
+     * @throws EntityNotFoundException If the daily record or user cannot be found.
+     */
     public void setCountermeasureSelectionForCurrentRecord(String loginName, List<ElementSelectionDTO> updatedSelection)
             throws EntityNotFoundException {
+        // Fetch the current daily record for the given username.
         DailyRecord dailyRecord = getCurrentDailyRecord(loginName);
+
+        // Clear existing countermeasure selections.
         dailyRecord.getCounterMeasures().clear();
-        for (ElementSelectionDTO elementSelectionDTO : updatedSelection) {
-            if (elementSelectionDTO.isSelected()) {
-                if (counterMeasureRepository.existsById(elementSelectionDTO.getName())) {
-                    dailyRecord.getCounterMeasures()
-                            .add(counterMeasureRepository.findById(elementSelectionDTO.getName()).get());
+
+        // Iterate over the updated selections.
+        for (ElementSelectionDTO selection : updatedSelection) {
+            // Proceed only if the countermeasure is selected.
+            if (selection.isSelected()) {
+                // Check if the countermeasure already exists in the repository.
+                Optional<CounterMeasure> cmOptional = counterMeasureRepository.findById(selection.getName());
+                if (cmOptional.isPresent()) {
+                    // Add the existing countermeasure to the daily record.
+                    dailyRecord.getCounterMeasures().add(cmOptional.get());
                 } else {
-                    CounterMeasure cm = new CounterMeasure();
-                    cm.setName(elementSelectionDTO.getName());
-                    cm.setDefault(false);
-                    counterMeasureRepository.save(cm);
-                    dailyRecord.getCounterMeasures().add(cm);
+                    // Create and save a new countermeasure if it does not exist.
+                    CounterMeasure newCM = new CounterMeasure();
+                    newCM.setName(selection.getName());
+                    newCM.setDefault(false);                    
+                    counterMeasureRepository.save(newCM);
+                    dailyRecord.getCounterMeasures().add(newCM);
                 }
             }
         }
+
+        // Save the updated daily record.
         dailyRecordRepository.save(dailyRecord);
     }
 
+    /**
+     * Generates an overview DTO for the latest daily record of a given user.
+     * 
+     * @param loginName The username of the user whose overview is to be generated.
+     * @return An {@link OverviewDTO} containing a summary of the latest daily record.
+     * @throws EntityNotFoundException If the daily record or user cannot be found.
+     */
     public OverviewDTO getOverview(String loginName) throws EntityNotFoundException {
+        // Fetch the current daily record for the given username.
         DailyRecord dailyRecord = getCurrentDailyRecord(loginName);
+
+        // Generate and return an overview DTO from the daily record.
         return new OverviewDTO(dailyRecord);
     }
 
+    /**
+     * Retrieves the most recent DailyRecord for a given user, creating a new one if necessary.
+     * 
+     * @param loginName The username of the user.
+     * @return The most recent {@link DailyRecord} for the user.
+     * @throws EntityNotFoundException If the user cannot be found.
+     */
     public DailyRecord getCurrentDailyRecord(String loginName) throws EntityNotFoundException {
         Optional<User> userOptional = userRepository.findById(loginName);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            DailyRecord dailyRecord = dailyRecordRepository.findMostRecentSituation(user);
-            // This is only true for new users. Otherwise a daily record exists.
-            if (dailyRecord == null) {
-                dailyRecord = new DailyRecord();
-                user.getRecords().add(dailyRecord);
-                dailyRecordRepository.save(dailyRecord);
-                userRepository.save(user);
-            }
-            return dailyRecord;
-        } else {
+        if (!userOptional.isPresent()) {
             throw new EntityNotFoundException();
         }
+
+        User user = userOptional.get();
+        DailyRecord dailyRecord = dailyRecordRepository.findMostRecentSituation(user);
+
+        // Create a new daily record if the user does not have any records yet.
+        if (dailyRecord == null) {
+            dailyRecord = new DailyRecord();
+            user.getRecords().add(dailyRecord);
+            dailyRecordRepository.save(dailyRecord);
+            userRepository.save(user);
+        }
+
+        return dailyRecord;
     }
 
-    public List<DailyRecord> getAllRecordsOfPrincipal(String loginName) throws EntityNotFoundException {      
+    /**
+     * Retrieves all daily records for a given user, sorted in a specified order.
+     * 
+     * @param loginName The username of the user.
+     * @return A list of all {@link DailyRecord}s for the user.
+     * @throws EntityNotFoundException If the user cannot be found.
+     */
+    public List<DailyRecord> getAllRecordsOfPrincipal(String loginName) throws EntityNotFoundException {
         Optional<User> userOptional = userRepository.findById(loginName);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return dailyRecordRepository.findAllSiutationsOrdered(user);
-
-        } else {
+        if (!userOptional.isPresent()) {
             throw new EntityNotFoundException();
         }
+
+        User user = userOptional.get();
+        return dailyRecordRepository.findAllSiutationsOrdered(user);
     }
 
 }

@@ -1,5 +1,7 @@
 <template>
+    <!-- Container for charts and modal -->
     <div>
+        <!-- Pain and Stress chart -->
         <div class="container-fluid pt-3">
             <div class="card">
                 <div class="card-header">
@@ -12,6 +14,7 @@
             </div>
         </div>
 
+        <!-- Tree Descriptors -->
         <div class="container-fluid pt-3">
             <div class="card">
                 <div class="card-header">
@@ -19,10 +22,11 @@
                 </div>
                 <div class="card-body">
                     <div class="container">
-                        <div class="row text-center">
-                            <div class="col-xs-4" v-for="tree in treeDescriptor" v-bind:key="tree">
+                        <div class="row text-center horizontal-scrollable">
+                            <!-- Iterate over tree descriptors -->
+                            <div class="col-xs-4" v-for="tree in treeDescriptor" :key="tree.date">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#treeinfo"
-                                    v-on:click.prevent="modalTreeClicked(tree)">
+                                    @click="modalTreeClicked(tree)">
                                     <div style="height:100px; position: relative;">
                                         <img :src="tree.imagePath"
                                             style="height: 100%; max-width: 100%; position: absolute; top: 0; left: 0;" />
@@ -38,149 +42,139 @@
             </div>
         </div>
 
-
+        <!-- Modal for displaying tree info -->
         <div class="modal fade" id="treeinfo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Ihr Lebensbaum
-                        </h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Ihr Lebensbaum</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        {{ currentTreeDescriptor.date }}
+                        <!-- Display current tree descriptor data -->
+                        <div>{{ currentTreeDescriptor.date }}</div>
                         <div class="table-responsive">
                             <table class="table" style="font-size: 11px;">
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th scope="col" v-for="situation in currentTreeDescriptor.situations"
-                                            v-bind:key="situation">{{ situation.timeOfDay }}</th>
+                                        <!-- Display time of day for each situation -->
+                                        <th v-for="situation in currentTreeDescriptor.situations" :key="situation">{{
+                                            situation.timeOfDay }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <!-- Display pain level for each situation -->
                                     <tr>
                                         <th scope="row">Schmerz-Intensität</th>
-                                        <td v-for="situation in currentTreeDescriptor.situations"
-                                            v-bind:key="situation">
-                                            {{ situation.painLevel }}</td>
+                                        <td v-for="situation in currentTreeDescriptor.situations" :key="situation">{{
+                                            situation.painLevel }}</td>
                                     </tr>
+                                    <!-- Display stress level for each situation -->
                                     <tr>
                                         <th scope="row">Stress-Level</th>
-                                        <td v-for="situation in currentTreeDescriptor.situations"
-                                            v-bind:key="situation">
-                                            {{ situation.stressLevel }}</td>
+                                        <td v-for="situation in currentTreeDescriptor.situations" :key="situation">{{
+                                            situation.stressLevel }}</td>
                                     </tr>
+                                    <!-- Display symptoms for each situation -->
                                     <tr>
                                         <th scope="row">Symptome</th>
-                                        <td v-for="situation in currentTreeDescriptor.situations"
-                                            v-bind:key="situation">
+                                        <td v-for="situation in currentTreeDescriptor.situations" :key="situation">
                                             <ul style="list-style-type: none; padding-left: 0; margin-left: 0;">
-                                                <li v-for="symptom in situation.symptoms" v-bind:key="symptom">{{
-                                symptom.name }}</li>
+                                                <li v-for="symptom in situation.symptoms" :key="symptom">{{ symptom.name }}
+                                                </li>
                                             </ul>
                                         </td>
                                     </tr>
+                                    <!-- Display stressors for each situation -->
                                     <tr>
                                         <th scope="row">Stressoren</th>
-                                        <td v-for="situation in currentTreeDescriptor.situations"
-                                            v-bind:key="situation">
+                                        <td v-for="situation in currentTreeDescriptor.situations" :key="situation">
                                             <ul style="list-style-type: none; padding-left: 0; margin-left: 0;">
-                                                <li v-for="stressor in situation.stressors" v-bind:key="stressor">{{
-                                stressor.name }}</li>
+                                                <li v-for="stressor in situation.stressors" :key="stressor">{{ stressor.name
+                                                }}</li>
                                             </ul>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary"
-                        style="background-color: lightseagreen; border-color: lightseagreen; outline: none;"
-                        data-bs-dismiss="modal">Schliessen</button>
+                    <div class="modal-footer">
+                        <!-- Close button for modal -->
+                        <button type="button" class="btn btn-primary"
+                            style="background-color: lightseagreen; border-color: lightseagreen; outline: none;"
+                            data-bs-dismiss="modal">Schliessen</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
-
+  
 <script setup>
 import { ref, onMounted } from 'vue';
+import { Chart, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale } from 'chartjs';
 
-import { Chart, ChartConfiguration, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale } from 'chartjs';
-
-
+// Register chart elements and scales
 Chart.register(LineController, LineElement, PointElement, LinearScale, Title, CategoryScale);
 
-
-const treeDescriptor = new ref([]);
-const currentTreeDescriptor = new ref();
-const dailyRecords = new ref([]);
+// Initialize reactive variables
+const treeDescriptor = ref([]);
+const currentTreeDescriptor = ref();
+const dailyRecords = ref([]);
 
 currentTreeDescriptor.value = {
     date: "",
     situations: [],
 };
 
+// Fetch data from APIs on component mount
 onMounted(() => {
-
     axios.get('/api/plot/pain').then(responsePain => {
+        // Process pain data
         let pain = responsePain.data;
         axios.get('/api/plot/stress').then(responseStress => {
+            // Process stress data
             let stress = responseStress.data;
-            Chart.defaults.plugins.legend = {
-                enabled: true
-            };
+            // Create and configure chart
             new Chart(document.getElementById('pain-chart'), {
                 type: "line",
                 data: {
                     labels: pain.labels,
                     datasets: [
-                        {
-                            label: "Pain",
-                            data: pain.data,
-                            borderColor: "red"
-                        },
-                        {
-                            label: "Stress",
-                            data: stress.data,
-                            borderColor: "blue"
-                        }
+                        { label: "Pain", data: pain.data, borderColor: "red" },
+                        { label: "Stress", data: stress.data, borderColor: "blue" }
                     ]
                 },
                 options: {
                     plugins: {
                         legend: {
-                            display: true, // This makes sure the legend is displayed
-                            position: 'bottom', // This positions the legend at the bottom of the chart
+                            display: true,
+                            position: 'bottom',
                             labels: {
-                                font: { // This customizes the legend's label font
-                                    size: 14,
-                                    weight: 'italic'
-                                },
-                                padding: 10 // Moved padding outside of font, directly under labels
+                                font: { size: 14, weight: 'italic' },
+                                padding: 10
                             }
                         }
                     }
                 }
             });
-
         });
-
     });
 
     axios.get('/api/record').then(responseStress => {
+
+
+        // Process daily records
         let allRecords = responseStress.data;
         dailyRecords.value = allRecords;
-        let selectedCms = 0;
-        let imagePath = "";
-        let overlayPath = "";
 
         allRecords.forEach(record => {
-            selectedCms = record.counterMeasures.length;
+            // Process each record
+            let selectedCms = record.counterMeasures.length;
+            let imagePath = "";
+            let overlayPath = "";
             if (selectedCms > 3) {
                 selectedCms = 3;
             }
@@ -209,42 +203,31 @@ onMounted(() => {
                 imagePath: imagePath,
                 overlayPath: overlayPath
             });
-        })
-
-        console.log(treeDescriptor.value);
-
+        });
     });
 });
 
+// Function to handle click on tree image
 const modalTreeClicked = (tree) => {
-
     currentTreeDescriptor.value.date = tree.date;
-
+    // Find corresponding daily record
     dailyRecords.value.forEach(dr => {
         if (dr.dateTime === tree.date) {
             currentTreeDescriptor.value.situations = dr.situations;
-
         }
-    })
-
-
-    console.log(currentTreeDescriptor.value);
-
-}
-
+    });
+};
 </script>
-
+  
 <style>
-/* The heart of the matter */
-
+/* Additional styles for horizontal scroll */
 .horizontal-scrollable>.row {
-    overflow-x: auto
+    overflow-x: auto;
 }
 
-
-/* Decorations */
-
+/* Styles for card column width */
 .col-xs-4 {
     max-width: 130px;
 }
 </style>
+  
