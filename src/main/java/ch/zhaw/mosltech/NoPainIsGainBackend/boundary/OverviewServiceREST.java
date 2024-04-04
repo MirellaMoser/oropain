@@ -1,63 +1,51 @@
 package ch.zhaw.mosltech.NoPainIsGainBackend.boundary;
 
 import java.security.Principal;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.zhaw.mosltech.NoPainIsGainBackend.controller.PlotController;
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.GraphDataDTO;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecord;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecordRepository;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.User;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.UserRepository;
+import ch.zhaw.mosltech.NoPainIsGainBackend.exceptions.EntityNotFoundException;
 
 @RestController
-@RequestMapping("/api/overview")
+@RequestMapping("/api/plot")
 public class OverviewServiceREST {
 
     @Autowired
-    private UserRepository userRepository;
+    private PlotController plotController;
 
-    @Autowired
-    private DailyRecordRepository dailyRecordRepository;
+    private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
-    @GetMapping("/painPlot")
-    private GraphDataDTO getPainData(Principal principal) {
-        GraphDataDTO res = new GraphDataDTO();       
-        List<DailyRecord> dailyRecords = getAllRecordsOfPrincipal(principal);
-
-        for (DailyRecord dailyRecord : dailyRecords) {
-            res.getLabels().add(dailyRecord.getDateTime().toString());
-            res.getData().add(dailyRecord.getAveragePainLevel());
-        }
-        return res;
-    }
-
-    @GetMapping("/stressPlot")
-    private GraphDataDTO getStressData(Principal principal) {
-        GraphDataDTO res = new GraphDataDTO();        
-        List<DailyRecord> dailyRecords = getAllRecordsOfPrincipal(principal);
-
-        for (DailyRecord dailyRecord : dailyRecords) {
-            res.getLabels().add(dailyRecord.getDateTime().toString());
-            res.getData().add(dailyRecord.getAverageStressLevel());
-        }
-
-        return res;
-    }
-
-    @GetMapping("/dailyRecords")
-    private List<DailyRecord> getDailyRecords(Principal principal) {
-        return getAllRecordsOfPrincipal(principal);
-    }
-
-    private List<DailyRecord> getAllRecordsOfPrincipal(Principal principal) {
+    @GetMapping("/pain")
+    private ResponseEntity<GraphDataDTO> getPainData(Principal principal) {
         String loginName = principal.getName();
-        User user = userRepository.findById(loginName).get();
-        return dailyRecordRepository.findAllSiutationsOrdered(user);
+        try {
+            GraphDataDTO painData = plotController.getPainPlotData(loginName);
+            return new ResponseEntity<>(painData, HttpStatus.OK);
+        } catch (EntityNotFoundException enfe) {
+            LOGGER.log(Level.SEVERE, enfe.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
+    @GetMapping("/stress")
+    private ResponseEntity<GraphDataDTO> getStressData(Principal principal) {
+        String loginName = principal.getName();
+        try {
+            GraphDataDTO stressData = plotController.getStressPlotData(loginName);
+            return new ResponseEntity<>(stressData, HttpStatus.OK);
+        } catch (EntityNotFoundException enfe) {
+            LOGGER.log(Level.SEVERE, enfe.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }   
 
 }

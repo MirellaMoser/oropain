@@ -36,21 +36,20 @@
                 </ul>
             </div>
             <div style="position:relative; text-align: center; margin-top: 20px;">
-                    <div style="position: absolute; left: 50%; top: 0px; transform: translateX(-50%);">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
-                            <img :src="imagePath" style="width: 100%; max-width: 100%;">
-                        </a>
-                    </div>
-                    <div style="position: absolute; left: 50%; top: 0px; transform: translateX(-50%);">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
-                            <img :src="overlayPath" style="width: 100%; max-width: 100%;">
-                        </a>
-                    </div>
+                <div style="position: absolute; left: 50%; top: 0px; transform: translateX(-50%);">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
+                        <img :src="imagePath" style="width: 100%; max-width: 100%;">
+                    </a>
                 </div>
+                <div style="position: absolute; left: 50%; top: 0px; transform: translateX(-50%);">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#baumerweiterung">
+                        <img :src="overlayPath" style="width: 100%; max-width: 100%;">
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <div class="modal fade" id="baumerweiterung" tabindex="-1" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="baumerweiterung" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -88,11 +87,11 @@ const overlayPath = ref();
 
 
 onMounted(() => {
-    axios.get('/api/situation/current/countermeasures').then(response => {
+    axios.get('/api/record/current/countermeasures').then(response => {
         countermeasuresOptions.value = response.data;
         updateOverviewImage();
     });
-    axios.get('/api/situation/current/overview').then(response => {
+    axios.get('/api/record/current/overview').then(response => {
         overview.value = response.data;
         updateOverviewImage();
         console.log(response.data);
@@ -101,7 +100,7 @@ onMounted(() => {
 });
 
 const saveCountermeasures = () => {
-    axios.post('/api/situation/current/countermeasures', countermeasuresOptions.value).then(response => {
+    axios.post('/api/record/current/countermeasures', countermeasuresOptions.value).then(response => {
         updateOverviewImage();
     });
 };
@@ -109,7 +108,6 @@ const saveCountermeasures = () => {
 const updateOverviewImage = () => {
 
     var selectedCms = 0;
-
     var intensityRounded = Math.round(overview.value.intensity);
 
     for (const cm of countermeasuresOptions.value) {

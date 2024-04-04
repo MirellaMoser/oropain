@@ -127,9 +127,9 @@ currentTreeDescriptor.value = {
 
 onMounted(() => {
 
-    axios.get('/api/overview/painPlot').then(responsePain => {
+    axios.get('/api/plot/pain').then(responsePain => {
         let pain = responsePain.data;
-        axios.get('/api/overview/stressPlot').then(responseStress => {
+        axios.get('/api/plot/stress').then(responseStress => {
             let stress = responseStress.data;
             Chart.defaults.plugins.legend = {
                 enabled: true
@@ -172,7 +172,7 @@ onMounted(() => {
 
     });
 
-    axios.get('/api/overview/dailyRecords').then(responseStress => {
+    axios.get('/api/record').then(responseStress => {
         let allRecords = responseStress.data;
         dailyRecords.value = allRecords;
         let selectedCms = 0;

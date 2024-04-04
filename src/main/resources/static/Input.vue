@@ -80,7 +80,7 @@ const availabelTimeSlots = ref([]);
 const stressorSelectModel = ref(new Map());
 
 onMounted(() => {
-    axios.get('/api/situation/new/empty').then(response => {
+    axios.get('/api/situation/empty').then(response => {
         selectionModel.value = response.data;
         debugger;
 

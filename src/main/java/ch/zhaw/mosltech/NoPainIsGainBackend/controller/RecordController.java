@@ -88,4 +88,15 @@ public class RecordController {
         }
     }
 
+    public List<DailyRecord> getAllRecordsOfPrincipal(String loginName) throws EntityNotFoundException {      
+        Optional<User> userOptional = userRepository.findById(loginName);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return dailyRecordRepository.findAllSiutationsOrdered(user);
+
+        } else {
+            throw new EntityNotFoundException();
+        }
+    }
+
 }
