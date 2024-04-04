@@ -26,27 +26,20 @@ public class OverviewServiceREST {
 
     @GetMapping("/painPlot")
     private GraphDataDTO getPainData(Principal principal) {
-        GraphDataDTO res = new GraphDataDTO();
-        String loginName = principal.getName();
-        User user = userRepository.findById(loginName).get();
-
-        List<DailyRecord> dailyRecords = dailyRecordRepository.findAllSiutationsOrdered(user);
+        GraphDataDTO res = new GraphDataDTO();       
+        List<DailyRecord> dailyRecords = getAllRecordsOfPrincipal(principal);
 
         for (DailyRecord dailyRecord : dailyRecords) {
             res.getLabels().add(dailyRecord.getDateTime().toString());
             res.getData().add(dailyRecord.getAveragePainLevel());
         }
-
         return res;
     }
 
     @GetMapping("/stressPlot")
     private GraphDataDTO getStressData(Principal principal) {
-        GraphDataDTO res = new GraphDataDTO();
-        String loginName = principal.getName();
-        User user = userRepository.findById(loginName).get();
-
-        List<DailyRecord> dailyRecords = dailyRecordRepository.findAllSiutationsOrdered(user);
+        GraphDataDTO res = new GraphDataDTO();        
+        List<DailyRecord> dailyRecords = getAllRecordsOfPrincipal(principal);
 
         for (DailyRecord dailyRecord : dailyRecords) {
             res.getLabels().add(dailyRecord.getDateTime().toString());
@@ -58,10 +51,13 @@ public class OverviewServiceREST {
 
     @GetMapping("/dailyRecords")
     private List<DailyRecord> getDailyRecords(Principal principal) {
+        return getAllRecordsOfPrincipal(principal);
+    }
+
+    private List<DailyRecord> getAllRecordsOfPrincipal(Principal principal) {
         String loginName = principal.getName();
         User user = userRepository.findById(loginName).get();
-        List<DailyRecord> dailyRecords = dailyRecordRepository.findAllSiutationsOrdered(user);
-        return dailyRecords;
+        return dailyRecordRepository.findAllSiutationsOrdered(user);
     }
 
 }

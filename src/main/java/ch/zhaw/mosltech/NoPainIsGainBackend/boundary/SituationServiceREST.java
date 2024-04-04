@@ -1,11 +1,9 @@
 package ch.zhaw.mosltech.NoPainIsGainBackend.boundary;
 
 import java.security.Principal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,222 +14,100 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.zhaw.mosltech.NoPainIsGainBackend.controller.RecordController;
+import ch.zhaw.mosltech.NoPainIsGainBackend.controller.SituationController;
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.ElementSelectionDTO;
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.InputDTO;
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.OverviewDTO;
-import ch.zhaw.mosltech.NoPainIsGainBackend.dto.StressorSelectionDTO;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.CounterMeasure;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.CounterMeasureRepository;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecord;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecordRepository;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.ETimeOfDay;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Situation;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.SituationRepository;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Stressor;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.StressorRepository;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.Symptom;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.SymptomRepository;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.User;
-import ch.zhaw.mosltech.NoPainIsGainBackend.entity.UserRepository;
+import ch.zhaw.mosltech.NoPainIsGainBackend.exceptions.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api/situation")
 public class SituationServiceREST {
 
     @Autowired
-    private CounterMeasureRepository counterMeasureRepository;
+    private SituationController situationController;
 
     @Autowired
-    private UserRepository userRepository;
+    private RecordController recordController;
 
-    @Autowired
-    private DailyRecordRepository dailyRecordRepository;
-
-    @Autowired
-    private SituationRepository situationRepository;
-
-    @Autowired
-    private SymptomRepository symptomRepository;
-
-    @Autowired
-    private StressorRepository stressorRepository;
+    private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
     @GetMapping("/current/countermeasures")
-    public List<ElementSelectionDTO> getAllDefaultCounterMeasures(Principal principal) {
-        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
-        List<CounterMeasure> defaultCounterMeasures = counterMeasureRepository.findAllByIsDefault(true);
-        List<ElementSelectionDTO> selectedCounterMeasures = new ArrayList<>();
-        for (CounterMeasure defaultCM : defaultCounterMeasures) {
-            if (dailyRecord.getCounterMeasures().contains(defaultCM)) {
-                selectedCounterMeasures.add(new ElementSelectionDTO(defaultCM.getName(), true));
-            } else {
-                selectedCounterMeasures.add(new ElementSelectionDTO(defaultCM.getName(), false));
-            }
+    public ResponseEntity<List<ElementSelectionDTO>> getAllDefaultCounterMeasures(Principal principal) {
+        String loginName = principal.getName();
+        try {
+            List<ElementSelectionDTO> overview = recordController
+                    .getCountermeasureSelectionForCurrentRecord(loginName);
+            return new ResponseEntity<>(overview, HttpStatus.OK);
+        } catch (EntityNotFoundException enfe) {
+            LOGGER.log(Level.SEVERE, enfe.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return selectedCounterMeasures;
     }
 
     @PostMapping("/current/countermeasures")
-    public void updateCounterMeasures(Principal principal, @RequestBody List<ElementSelectionDTO> currentSelection) {
-        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
-        dailyRecord.getCounterMeasures().clear();
-        for (ElementSelectionDTO elementSelectionDTO : currentSelection) {
-            if (elementSelectionDTO.isSelected()) {
-                if (counterMeasureRepository.existsById(elementSelectionDTO.getName())) {
-                    dailyRecord.getCounterMeasures()
-                            .add(counterMeasureRepository.findById(elementSelectionDTO.getName()).get());
-                } else {
-                    CounterMeasure cm = new CounterMeasure();
-                    cm.setName(elementSelectionDTO.getName());
-                    cm.setDefault(false);
-                    counterMeasureRepository.save(cm);
-                    dailyRecord.getCounterMeasures().add(cm);
-                }
-            }
+    public ResponseEntity<Void> updateCounterMeasures(Principal principal,
+            @RequestBody List<ElementSelectionDTO> currentSelection) {
+        String loginName = principal.getName();
+        try {
+            recordController.setCountermeasureSelectionForCurrentRecord(loginName, currentSelection);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (EntityNotFoundException enfe) {
+            LOGGER.log(Level.SEVERE, enfe.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        dailyRecordRepository.save(dailyRecord);
     }
 
     @GetMapping("/current/overview")
     public ResponseEntity<OverviewDTO> getOverview(Principal principal) {
-        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
-        return new ResponseEntity<>(new OverviewDTO(dailyRecord), HttpStatus.OK);
+        String loginName = principal.getName();
+        try {
+            OverviewDTO overview = recordController.getOverview(loginName);
+            return new ResponseEntity<>(overview, HttpStatus.OK);
+        } catch (EntityNotFoundException enfe) {
+            LOGGER.log(Level.SEVERE, enfe.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/current/symptoms")
-    public List<ElementSelectionDTO> getAllSymptoms(Principal principal) {
-        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
-        List<Symptom> symptoms = symptomRepository.findByIsDefault(true);
-        // symptoms.addAll(symptomRepository.findOwnButNotDefault(user));
-
-        List<ElementSelectionDTO> selectedSymptoms = new ArrayList<>();
-
-        for (Symptom symptom : symptoms) {
-            if (dailyRecord.getLatestSituation().getSymptoms().contains(symptom)) {
-                selectedSymptoms.add(new ElementSelectionDTO(symptom.getName(), true));
-            } else {
-                selectedSymptoms.add(new ElementSelectionDTO(symptom.getName(), false));
-            }
+    public ResponseEntity<List<ElementSelectionDTO>> getAllSymptoms(Principal principal) {
+        String loginName = principal.getName();
+        try {
+            List<ElementSelectionDTO> overview = situationController
+                    .getCurrentSituationSymptomsSelection(loginName);
+            return new ResponseEntity<>(overview, HttpStatus.OK);
+        } catch (EntityNotFoundException enfe) {
+            LOGGER.log(Level.SEVERE, enfe.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return selectedSymptoms;
     }
 
     @GetMapping("/new/empty")
-    public InputDTO getNewEntrySituation(Principal principal) {
-
-        List<ElementSelectionDTO> defaultSymptoms = getDefaultSymptoms();
-        List<StressorSelectionDTO> defaultStressors = getDefaultStressors();
-        List<ETimeOfDay> availableEntries = new ArrayList<>();
-        availableEntries.add(ETimeOfDay.MORNING);
-        availableEntries.add(ETimeOfDay.AFTERNOON);
-        availableEntries.add(ETimeOfDay.EVENING);
-
-        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        if (sdf.format(dailyRecord.getDateTime()).equals(sdf.format(new Date()))) {
-            for (Situation situation : dailyRecord.getSituations()) {
-                availableEntries.remove(situation.getTimeOfDay());
-            }
+    public ResponseEntity<InputDTO> getNewEntrySituation(Principal principal) {
+        String loginName = principal.getName();
+        try {
+            InputDTO inputDTO = situationController.populateBlankInputDTO(loginName);
+            return new ResponseEntity<>(inputDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException enfe) {
+            LOGGER.log(Level.SEVERE, enfe.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        return new InputDTO(0, defaultSymptoms, 0, defaultStressors, new Date(), ETimeOfDay.MORNING, availableEntries);
     }
 
     @PostMapping
-    public void updateCounterMeasures(Principal principal, @RequestBody InputDTO input) {
-        String loginName = principal.getName();
-        User user = userRepository.findById(loginName).get();
-
-        Situation situation = new Situation();
-        situation.setTimeOfDay(input.getTimeOfDay());
-        situation.setPainLevel(input.getIntensity());
-        situation.setStressLevel(input.getStressLevel());
-        for (StressorSelectionDTO element : input.getStressors()) {
-            if (!element.isSelected())
-                continue;
-            Optional<Stressor> so = stressorRepository.findById(element.getName());
-            if (so.isPresent()) {
-                situation.getStressors().add(so.get());
-            } else {
-                Stressor s = new Stressor();
-                s.setName(element.getName());
-                s.setCategory("Custom");
-                stressorRepository.save(s);
-                situation.getStressors().add(s);
-            }
+    public ResponseEntity<Void> postNewSituation(Principal principal, @RequestBody InputDTO input) {
+         String loginName = principal.getName();
+        try {
+            situationController.addSituation(loginName, input);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (EntityNotFoundException enfe) {
+            LOGGER.log(Level.SEVERE, enfe.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        for (ElementSelectionDTO element : input.getSymptoms()) {
-            if (!element.isSelected())
-                continue;
-            Optional<Symptom> so = symptomRepository.findById(element.getName());
-            if (so.isPresent()) {
-                situation.getSymptoms().add(so.get());
-            } else {
-                Symptom s = new Symptom();
-                s.setName(element.getName());
-                symptomRepository.save(s);
-                situation.getSymptoms().add(s);
-            }
-        }
-
-        situationRepository.save(situation);
-
-        DailyRecord dailyRecord = getCurrentDailyRecord(principal);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        if (!sdf.format(dailyRecord.getDateTime()).equals(sdf.format(new Date()))) {
-            DailyRecord newRecord = new DailyRecord();
-            newRecord.setDateTime(new Date());
-            newRecord.getSituations().add(situation);
-            dailyRecordRepository.save(newRecord);
-            user.getRecords().add(newRecord);
-            userRepository.save(user);
-
-        } else {
-            dailyRecord.getSituations().add(situation);
-            dailyRecordRepository.save(dailyRecord);
-        }
+        
     }
 
-    private DailyRecord getCurrentDailyRecord(Principal principal) {
-        String loginName = principal.getName();
-        User user = userRepository.findById(loginName).get();
-        DailyRecord situation = dailyRecordRepository.findMostRecentSituation(user);
-
-        if (situation == null) {
-            situation = new DailyRecord();
-            user.getRecords().add(situation);
-            dailyRecordRepository.save(situation);
-            userRepository.save(user);
-        }
-
-        return situation;
-    }
-
-    private List<ElementSelectionDTO> getDefaultSymptoms() {
-
-        List<ElementSelectionDTO> defaultSelection = new ArrayList<>();
-
-        List<Symptom> defaultSymptoms = symptomRepository.findByIsDefault(true);
-        for (Symptom symptom : defaultSymptoms) {
-            defaultSelection.add(new ElementSelectionDTO(symptom.getName(), false));
-        }
-
-        return defaultSelection;
-    }
-
-    private List<StressorSelectionDTO> getDefaultStressors() {
-
-        List<StressorSelectionDTO> defaultSelection = new ArrayList<>();
-
-        List<Stressor> defaultStressors = stressorRepository.findByIsDefault(true);
-        for (Stressor stressor : defaultStressors) {
-            defaultSelection.add(new StressorSelectionDTO(stressor.getName(), stressor.getCategory(), false));
-        }
-
-        return defaultSelection;
-    }
 }
