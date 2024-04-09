@@ -15,8 +15,7 @@
 	<description>Backend for NoPainIsGainDemonstrator</description>
 	<properties>
 		<java.version>17</java.version>
-		<spring-boot.run.jvmArguments>-Dfile.encoding=UTF-8</spring-boot.run.jvmArguments>
-		
+		<spring-boot.run.jvmArguments>-Dfile.encoding=UTF-8</spring-boot.run.jvmArguments>		
 	</properties>
 	<dependencies>
 		<dependency>
