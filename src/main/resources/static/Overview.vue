@@ -59,8 +59,11 @@
                                     <tr>
                                         <th></th>
                                         <!-- Display time of day for each situation -->
-                                        <th v-for="situation in currentTreeDescriptor.situations" :key="situation">{{
-                                            situation.timeOfDay }}</th>
+                                        <th v-for="situation in currentTreeDescriptor.situations" :key="situation">
+                                            <div v-if="situation.timeOfDay == 'MORNING'">Morgen</div>
+                                            <div v-if="situation.timeOfDay == 'AFTERNOON'">Nachmittag</div>
+                                            <div v-if="situation.timeOfDay == 'EVENING'">Abend</div>                                            
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -73,8 +76,12 @@
                                     <!-- Display stress level for each situation -->
                                     <tr>
                                         <th scope="row">Stress-Level</th>
-                                        <td v-for="situation in currentTreeDescriptor.situations" :key="situation">{{
-                                            situation.stressLevel }}</td>
+                                        <td v-for="situation in currentTreeDescriptor.situations" :key="situation">
+                                            <div v-if="situation.stressLevel == 0">kein</div>
+                                            <div v-if="situation.stressLevel == 1">tief</div>
+                                            <div v-if="situation.stressLevel == 2">mittel</div>
+                                            <div v-if="situation.stressLevel == 3">hoch</div>
+                                        </td>
                                     </tr>
                                     <!-- Display symptoms for each situation -->
                                     <tr>

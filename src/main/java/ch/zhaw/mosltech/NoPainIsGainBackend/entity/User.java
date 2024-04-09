@@ -44,6 +44,12 @@ public class User {
      */
     private String passwordHash;
 
+
+    /**
+     * The login role of the user.
+     */
+    private String roleName;
+
     /**
      * A list of daily health records associated with the user.
      * <p>

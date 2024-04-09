@@ -1,7 +1,11 @@
 package ch.zhaw.mosltech.NoPainIsGainBackend;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * Main application class for the NoPainIsGain backend service.
@@ -27,5 +31,10 @@ public class NoPainIsGainBackendApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(NoPainIsGainBackendApplication.class, args);
+
+
+
+
+
     }
 }

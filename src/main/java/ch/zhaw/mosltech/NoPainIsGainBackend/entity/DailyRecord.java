@@ -99,7 +99,7 @@ public class DailyRecord {
     @JsonIgnore
     public Situation getLatestSituation() {
         return situations.stream()
-                         .sorted((s1, s2) -> s1.getTimeOfDay().compareTo(s2.getTimeOfDay()))
+                         .sorted((s1, s2) -> s2.getTimeOfDay().compareTo(s1.getTimeOfDay()))
                          .findFirst().orElse(null);
     }
 }

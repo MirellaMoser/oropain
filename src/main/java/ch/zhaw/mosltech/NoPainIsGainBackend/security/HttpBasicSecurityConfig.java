@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * </p>
  */
 @Configuration
+@EnableMethodSecurity(securedEnabled = true)
 public class HttpBasicSecurityConfig {
 
     /**
@@ -46,6 +48,7 @@ public class HttpBasicSecurityConfig {
                     // Require authentication for all other requests
                     auth.anyRequest().authenticated();
                 })
+                .httpBasic(withDefaults())
                 // Configure form login with default settings
                 .formLogin(withDefaults())
                 // CSRF configuration to ignore the H2 console and API paths

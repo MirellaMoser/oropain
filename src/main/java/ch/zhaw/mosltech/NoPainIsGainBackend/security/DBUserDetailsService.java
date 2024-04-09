@@ -59,7 +59,7 @@ public class DBUserDetailsService implements UserDetailsService {
         // Define user authorities. Here, every user is granted with "User" authority by
         // default.
         Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority("User"));
+        authorities.add(new SimpleGrantedAuthority(user.get().getRoleName()));
 
         // Create and return a Spring Security User object with the loginName, password,
         // and authorities.

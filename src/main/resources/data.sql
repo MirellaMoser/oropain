@@ -1,5 +1,4 @@
-insert into USER_TABLE (LOGIN_NAME, PASSWORD_HASH) values ('user', '$2a$10$TI3vcVwae772ZW1W9ZkDPe4x/n/CV/G8Q.dXI9TtHwVa/FjIX3iw2');
-
+insert into USER_TABLE (LOGIN_NAME, ROLE_NAME, PASSWORD_HASH) values ('user', 'USER', '$2a$10$TI3vcVwae772ZW1W9ZkDPe4x/n/CV/G8Q.dXI9TtHwVa/FjIX3iw2');
 
 insert into DAILY_RECORD(DATE_TIME) values ('20240330');
 insert into DAILY_RECORD(DATE_TIME) values ('20240331');
