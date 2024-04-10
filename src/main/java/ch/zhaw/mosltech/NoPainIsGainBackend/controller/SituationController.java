@@ -24,6 +24,7 @@ import ch.zhaw.mosltech.NoPainIsGainBackend.entity.SymptomRepository;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.User;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.UserRepository;
 import ch.zhaw.mosltech.NoPainIsGainBackend.exceptions.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 /**
  * Service class for managing situations within daily health records.
@@ -32,6 +33,7 @@ import ch.zhaw.mosltech.NoPainIsGainBackend.exceptions.EntityNotFoundException;
  * and preparing DTOs for input forms.
  */
 @Service
+@Transactional
 public class SituationController {
 
     @Autowired

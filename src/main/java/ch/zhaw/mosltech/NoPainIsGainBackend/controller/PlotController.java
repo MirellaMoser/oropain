@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ch.zhaw.mosltech.NoPainIsGainBackend.dto.GraphDataDTO;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecord;
 import ch.zhaw.mosltech.NoPainIsGainBackend.exceptions.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 /**
  * Service layer for generating plot data for pain and stress levels over time.
@@ -18,6 +19,7 @@ import ch.zhaw.mosltech.NoPainIsGainBackend.exceptions.EntityNotFoundException;
  * </p>
  */
 @Service
+@Transactional
 public class PlotController {
 
     @Autowired

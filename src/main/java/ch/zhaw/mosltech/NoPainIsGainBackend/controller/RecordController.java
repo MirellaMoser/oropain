@@ -16,6 +16,7 @@ import ch.zhaw.mosltech.NoPainIsGainBackend.entity.DailyRecordRepository;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.User;
 import ch.zhaw.mosltech.NoPainIsGainBackend.entity.UserRepository;
 import ch.zhaw.mosltech.NoPainIsGainBackend.exceptions.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 /**
  * Service class for handling operations related to user records.
@@ -23,6 +24,7 @@ import ch.zhaw.mosltech.NoPainIsGainBackend.exceptions.EntityNotFoundException;
  * and also generating an overview of the daily health status.
  */
 @Service
+@Transactional
 public class RecordController {
 
     @Autowired
